@@ -1,0 +1,54 @@
+# 动态配置，每个用户都起一个  service
+# 通过 service 区分不同用户
+services:
+  - name: service-9010
+    addr: :9010
+    limiter: limiter-1
+    observer: observer-0 # 服务上的观测器
+    handler:
+      type: http2
+      # auth:
+      #   username: xxx
+      #   password: xxx
+    listener:
+      type: http2
+    metadata:
+      knock: www.google.com
+      probeResist: file:/var/www/html/index.html
+      enableStats: true # 开启统计
+
+# 静态配置。
+observers:
+  - name: observer-0
+    plugin:
+      type: http
+      addr: http://127.0.0.1:9000/observer
+      timeout: 10s
+
+# 静态配置
+tls:
+  certFile: /etc/gost/fullchain.pem
+  keyFile: /etc/gost/privkey.pem
+
+# 静态配置
+limiters:
+  - name: limiter-0
+    limits:
+      - "$$ 200KB 200KB"
+  - name: limiter-1
+    limits:
+      - "$$ 1MB 1MB"
+
+# authers:
+#   - name: auther-0
+#     plugin:
+#       type: http
+#       addr: http://127.0.0.1:9000/auth
+# 静态配置
+api:
+  addr: 0.0.0.0:9001
+  pathPrefix: /api
+  accesslog: true
+  auth:
+    username: admin
+    password: adminadmin

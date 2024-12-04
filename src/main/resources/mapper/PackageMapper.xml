@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hasikiFire.networkmall.dao.mapper.PackageMapper">
+  <select id="existsByPackageName" resultType="boolean"> SELECT COUNT(*) > 0 FROM package_item WHERE
+    package_name = #{packageName} </select>
+
+  <update id="updatePackageItem" parameterType="com.hasikiFire.networkmall.dao.entity.PackageItem">
+    UPDATE package_item <set>
+      <if test="packageName != null"> package_name = #{packageName}, </if>
+        <if
+        test="status != null"> package_status = #{status}, </if>
+        <if
+        test="packageDesc != null"> package_desc = #{packageDesc}, </if>
+        <if
+        test="originalPrice != null"> original_price = #{originalPrice}, </if>
+        <if
+        test="salePrice != null"> sale_price = #{salePrice}, </if>
+        <if
+        test="discount != null"> discount = #{discount}, </if>
+        <if
+        test="discountStartDate != null"> discount_start_date = #{discountStartDate}, </if>
+        <if
+        test="discountEndDate != null"> discount_end_date = #{discountEndDate}, </if>
+        <if
+        test="dataAllowance != null"> data_allowance = #{dataAllowance}, </if>
+        <if
+        test="deviceLimit != null"> device_limit = #{deviceLimit}, </if>
+        <if
+        test="speedLimit != null"> speed_limit = #{speedLimit}</if>
+    </set> WHERE id = #{id} </update>
+</mapper>
