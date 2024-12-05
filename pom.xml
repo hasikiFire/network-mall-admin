@@ -10,9 +10,10 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.hasikiFire</groupId>
-	<artifactId>network-mall</artifactId>
+	<artifactId>network-mall-admin</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>network-mall</name>
+	<name>network-mall-admin</name>
+ 
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>17</java.version>
@@ -143,6 +144,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>network-mall-admin</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
