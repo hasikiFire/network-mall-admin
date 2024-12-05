@@ -3,7 +3,7 @@ spring:
     # 应用名
     name: network-mall
   profiles:
-    active: dev
+    active: prod
 
   data:
     # Redis 配置
@@ -45,8 +45,6 @@ network:
       # - /system/notice/*
 
 ---
-
-
 #---------------------数据库配置---------------------------
 # spring:
 #   datasource:
@@ -71,8 +69,6 @@ network:
 #     accessToken: 123
 
 ---
-
-
 #----------------------安全配置----------------------------
 # spring:
 #   # Spring Boot 应用管理和监控
@@ -98,15 +94,11 @@ network:
 #       password: ENDPOINT_ADMIN
 #       roles: ENDPOINT_ADMIN
 ---
-
-
 #--------------------接口文档配置---------------------------
 # springdoc:
 #   api-docs:
 #     enabled: true
 ---
-
-
 #----------------------邮箱配置-----------------------------
 #邮箱服务器
 # spring:

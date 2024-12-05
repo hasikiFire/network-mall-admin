@@ -29,6 +29,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 application-dev.yml
+application-prod.yml
 src/test/java/com/hasikiFire/networkmall/GeneratorDev.java
 ### VS Code ###
 .vscode/
