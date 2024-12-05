@@ -11,8 +11,8 @@ FROM openjdk:17-jdk-slim
 # 设置工作目录
 WORKDIR /app
 
-# 将应用程序的 jar 文件复制到镜像中
-COPY target/network-mall-admin.jar app.jar
+# 从构建阶段复制 jar 文件到运行阶段
+COPY --from=builder /app/target/network-mall-admin.jar app.jar
 
 # 将配置文件复制到容器内
 COPY src/main/resources/application-prod.yml /app/config/application-prod.yml
