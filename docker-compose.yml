@@ -1,8 +1,9 @@
-version: '3.8'
+version: "3.8"
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: network-mall-admin
     ports:
       - "29999:8080"
