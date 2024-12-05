@@ -8,4 +8,6 @@
 # 部署项目
 
 1. 添加 application-prod.yml 文件到服务器任意目录 a
-2. 复制 deploy.sh 到服务器目录 a 下并执行，注意给权限
+2. 复制 deploy.sh 到服务器目录 a 下并执行 
+3. sudo chmod +x deploy.sh 
+4. sudo ./deploy.sh

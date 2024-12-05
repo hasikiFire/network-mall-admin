@@ -1,3 +1,10 @@
+# 构建阶段
+FROM maven:3.9.5-openjdk-17 AS builder
+WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
+
+# 运行阶段
 # 使用 OpenJDK 作为基础镜像
 FROM openjdk:17-jdk-slim
 
