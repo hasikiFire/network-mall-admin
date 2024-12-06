@@ -76,6 +76,10 @@ public class RestResp<T> {
         return new RestResp<>(ErrorCodeEnum.SYSTEM_ERROR, errorMessage);
     }
 
+    public static RestResp<Void> sucess() {
+        return new RestResp<>(ErrorCodeEnum.OK);
+    }
+
     /**
      * 系统错误
      */
