@@ -97,7 +97,7 @@ public class ForeignServer implements Serializable {
     private Integer consumedStorageGb;
 
     /**
-     * 服务器的状态。 1：活动，2：已暂停
+     * 服务器的状态。0: 停止 1：活动，2：过期
      */
     private Integer status;
 
@@ -115,7 +115,6 @@ public class ForeignServer implements Serializable {
      * 更新时间
      */
     private LocalDateTime updatedAt;
-
 
     public Long getId() {
         return id;
@@ -272,25 +271,25 @@ public class ForeignServer implements Serializable {
     @Override
     public String toString() {
         return "ForeignServer{" +
-        "id=" + id +
-        ", serverName=" + serverName +
-        ", supplier=" + supplier +
-        ", domainName=" + domainName +
-        ", ipAddress=" + ipAddress +
-        ", startDate=" + startDate +
-        ", monthlyFee=" + monthlyFee +
-        ", totalMonthlyDataTransfer=" + totalMonthlyDataTransfer +
-        ", consumedDataTransfer=" + consumedDataTransfer +
-        ", operatingSystem=" + operatingSystem +
-        ", cpuCores=" + cpuCores +
-        ", ramGb=" + ramGb +
-        ", remainingRamGb=" + remainingRamGb +
-        ", storageGb=" + storageGb +
-        ", consumedStorageGb=" + consumedStorageGb +
-        ", status=" + status +
-        ", deleted=" + deleted +
-        ", createdAt=" + createdAt +
-        ", updatedAt=" + updatedAt +
-        "}";
+                "id=" + id +
+                ", serverName=" + serverName +
+                ", supplier=" + supplier +
+                ", domainName=" + domainName +
+                ", ipAddress=" + ipAddress +
+                ", startDate=" + startDate +
+                ", monthlyFee=" + monthlyFee +
+                ", totalMonthlyDataTransfer=" + totalMonthlyDataTransfer +
+                ", consumedDataTransfer=" + consumedDataTransfer +
+                ", operatingSystem=" + operatingSystem +
+                ", cpuCores=" + cpuCores +
+                ", ramGb=" + ramGb +
+                ", remainingRamGb=" + remainingRamGb +
+                ", storageGb=" + storageGb +
+                ", consumedStorageGb=" + consumedStorageGb +
+                ", status=" + status +
+                ", deleted=" + deleted +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                "}";
     }
 }

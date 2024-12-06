@@ -4,7 +4,6 @@ import com.hasikiFire.networkmall.dao.entity.PackageItem;
 import com.hasikiFire.networkmall.dao.entity.PayOrder;
 import com.hasikiFire.networkmall.dao.entity.PayOrderItem;
 import com.hasikiFire.networkmall.dao.mapper.PayOrderItemMapper;
-import com.hasikiFire.networkmall.dto.req.PackageBuyReqDto;
 import com.hasikiFire.networkmall.service.PayOrderItemService;
 
 import lombok.RequiredArgsConstructor;
