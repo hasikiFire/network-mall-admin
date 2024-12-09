@@ -26,7 +26,7 @@ public class User implements Serializable {
     /**
      * 用户ID
      */
-    private Long userId;
+    private Long uuid;
 
     /**
      * 名字
@@ -87,12 +87,12 @@ public class User implements Serializable {
         this.id = id;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Long getUuid() {
+        return uuid;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUuid(Long uuid) {
+        this.uuid = uuid;
     }
 
     public String getName() {
@@ -179,7 +179,7 @@ public class User implements Serializable {
     public String toString() {
         return "User{" +
         "id=" + id +
-        ", userId=" + userId +
+        ", uuid=" + uuid +
         ", name=" + name +
         ", email=" + email +
         ", passwordHash=" + passwordHash +

@@ -17,6 +17,7 @@ import com.hasikiFire.networkmall.dto.req.ForeignServerListReqDto;
 import com.hasikiFire.networkmall.dto.resp.ForeignServerListRespDto;
 import com.hasikiFire.networkmall.service.ForeignServerService;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,9 +30,10 @@ import lombok.extern.slf4j.Slf4j;
  * @since 2024/06/03
  */
 @RestController
-@RequestMapping("/foreignServer")
+@RequestMapping("/admin/foreignServer")
 @RequiredArgsConstructor
 @Slf4j
+@SaCheckLogin
 public class ForeignServerController {
   private final ForeignServerService foreignServerService;
 
@@ -41,6 +43,7 @@ public class ForeignServerController {
    * @param params 包含服务器编辑信息的请求对象
    * @return 操作结果
    */
+
   @PutMapping("/edit")
   public RestResp<Void> editForeignServer(@RequestBody ForeignEditReqDto params) {
     // 实现编辑服务器逻辑
@@ -67,7 +70,7 @@ public class ForeignServerController {
    */
   @GetMapping("/list")
   public RestResp<PageRespDto<ForeignServerListRespDto>> getForeignServerList(
-      @RequestBody ForeignServerListReqDto params) {
+      ForeignServerListReqDto params) {
     // 实现获取服务器列表逻辑
     return foreignServerService.getForeignServerList(params);
   }

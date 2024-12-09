@@ -6,7 +6,6 @@ package com.hasikiFire.networkmall.dto.resp;
 
 import java.time.LocalDateTime;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
@@ -17,28 +16,13 @@ import lombok.Data;
 @Builder
 public class UserInfoRespDto {
 
-  /**
-   * 用户ID
-   */
   private Long userId;
 
-  /**
-   * 名字
-   */
   private String name;
 
-  /**
-   * 邮箱
-   */
   private String email;
 
-  /**
-   * 创建时间
-   */
   private LocalDateTime createdAt;
 
-  /**
-   * 更新时间
-   */
   private LocalDateTime updatedAt;
 }

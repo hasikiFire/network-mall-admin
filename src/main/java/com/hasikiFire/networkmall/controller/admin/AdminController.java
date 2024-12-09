@@ -68,7 +68,6 @@ public class AdminController {
     return packageService.getPackageAllList(params);
   }
 
-  //
   @PutMapping("/pacakge/edit")
   public RestResp<Void> editPackage(@Valid @RequestBody PackageEditReqDto params) {
     return packageService.editPackage(params);
