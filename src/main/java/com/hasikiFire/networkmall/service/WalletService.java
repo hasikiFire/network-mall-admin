@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * 钱包表 服务类
  * </p>
  *
- * @author ${author}
+ * @author ${hasikiFire}
  * @since 2024/06/03
  */
 public interface WalletService extends IService<Wallet> {

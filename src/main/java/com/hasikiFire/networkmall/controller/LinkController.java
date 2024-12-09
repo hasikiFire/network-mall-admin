@@ -7,15 +7,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
- * docker容器信息表 前端控制器
+ * 订阅链接表 前端控制器
  * </p>
  *
- * @author ${author}
- * @since 2024/06/03
+ * @author ${hasikiFire}
+ * @since 2024/12/10
  */
 @RestController
-@RequestMapping("/dockerContainer")
-public class DockerContainerController {
+@RequestMapping("/link")
+public class LinkController {
 
 }
 

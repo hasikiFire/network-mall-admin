@@ -1,9 +1,9 @@
 /*
- * @Author: hasikiFire
+ * @author: hasikiFire
  * @Date: 2024-06-04 11:13:28
  */
 /*
- * @Author: hasikiFire
+ * @author: hasikiFire
  * @Date: 2024-06-04 11:13:28
  */
 package com.hasikiFire.networkmall.service.impl;
@@ -18,10 +18,15 @@ import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.core.util.PasswordUtils;
 import com.hasikiFire.networkmall.core.util.RedisUtil;
 import com.hasikiFire.networkmall.core.util.SnowflakeDistributeId;
+import com.hasikiFire.networkmall.core.util.TokenGenerator;
+import com.hasikiFire.networkmall.dao.entity.Config;
+import com.hasikiFire.networkmall.dao.entity.Link;
 import com.hasikiFire.networkmall.dao.entity.Roles;
 import com.hasikiFire.networkmall.dao.entity.UsageRecord;
 import com.hasikiFire.networkmall.dao.entity.User;
 import com.hasikiFire.networkmall.dao.entity.Wallet;
+import com.hasikiFire.networkmall.dao.mapper.ConfigMapper;
+import com.hasikiFire.networkmall.dao.mapper.LinkMapper;
 import com.hasikiFire.networkmall.dao.mapper.RolesMapper;
 import com.hasikiFire.networkmall.dao.mapper.UsageRecordMapper;
 import com.hasikiFire.networkmall.dao.mapper.UserMapper;
@@ -36,6 +41,7 @@ import com.hasikiFire.networkmall.dto.resp.UserInfoRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserListRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserLoginRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserRegisterRespDto;
+import com.hasikiFire.networkmall.service.ForeignServerService;
 import com.hasikiFire.networkmall.service.UserService;
 
 import cn.dev33.satoken.stp.StpUtil;
@@ -51,15 +57,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.redisson.api.RBucket;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
@@ -73,12 +77,12 @@ import org.springframework.mail.javamail.JavaMailSender;
  * 用户表 服务实现类
  * </p>
  *
- * @author ${author}
+ * @author ${hasikiFire}
  * @since 2024/06/03
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
   @Value("${spring.mail.username}")
@@ -89,6 +93,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   private final WalletMapper walletMapper;
   private final RolesMapper roleMapper;
   private final UsageRecordMapper usageRecordMapper;
+  private final ForeignServerService foreignServerService;
+  private final ConfigMapper configMapper;
+  private final LinkMapper linkMapper;
 
   @Autowired
   private RedisUtil redisUtil;
@@ -388,5 +395,69 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
       throw new BusinessException("创建失败");
     }
     return RestResp.ok(user);
+  }
+
+  @Override
+  public RestResp<String> getSubscribe() {
+    // String token = "";
+    // Long userID = Long.parseLong(StpUtil.getLoginId().toString());
+    // Link tempLink = linkMapper.selectOne(new QueryWrapper<Link>().eq("user_id", userID));
+    // if (tempLink != null) {
+    //   token = tempLink.getToken();
+    // } else {
+    //   token = TokenGenerator.generateToken();
+    //   Link newLink = new Link();
+    //   newLink.setToken(token);
+    //   newLink.setUserId(userID);
+    //   linkMapper.insert(newLink);
+    // }
+
+    // String subscribeHost = "";
+    // List<Config> subscribeConfigs = configMapper.selectList(new QueryWrapper<Config>().eq("type", "subscribe"));
+    // // 使用传统的 for 循环
+    // for (Config config : subscribeConfigs) {
+    //   if ("subscribeHost".equals(config.getItem())) {
+    //     subscribeHost = config.getValue();
+    //     break; // 如果只需要找到第一个匹配项，可以在这里跳出循环
+    //   }
+    // }
+    // String finalLink = "https://" + subscribeHost + "/user/subscribe" + "?token=" + token;
+    // return RestResp.ok(finalLink);
+
+    // // 获取当前用户ID
+    Long userID = Long.parseLong(StpUtil.getLoginId().toString());
+
+    log.info("User getLoginId: {}", StpUtil.getLoginId());
+
+    // 从数据库获取用户的 Link 信息，若不存在则生成新的 token
+    Link tempLink = linkMapper.selectOne(new QueryWrapper<Link>().eq("user_id", userID));
+    String token = Optional.ofNullable(tempLink)
+        .map(Link::getToken)
+        .orElseGet(() -> {
+          String newToken = TokenGenerator.generateToken();
+          Link newLink = new Link();
+          newLink.setToken(newToken);
+          newLink.setUserId(userID);
+          linkMapper.insert(newLink);
+          return newToken;
+        });
+
+    // 从配置中获取 subscribeHost
+    String subscribeHost = configMapper.selectList(new QueryWrapper<Config>().eq("type", "subscribe"))
+        .stream()
+        .filter(config -> "subscribeHost".equals(config.getItem()))
+        .map(Config::getValue)
+        .findFirst()
+        .orElse(""); // 默认值为空字符串
+
+    // 构造最终的链接
+    String finalLink = "https://" + subscribeHost + "/user/subscribe?token=" + token;
+    return RestResp.ok(finalLink);
+  }
+
+  @Override
+  public String generateSubscribe() {
+
+    return null;
   }
 }

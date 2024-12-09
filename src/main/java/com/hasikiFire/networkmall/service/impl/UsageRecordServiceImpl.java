@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
  * 用户已购套餐记录表 服务实现类
  * </p>
  *
- * @author ${author}
+ * @author ${hasikiFire}
  * @since 2024/06/23
  */
 @Service

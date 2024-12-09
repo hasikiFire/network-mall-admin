@@ -23,7 +23,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * 用户表 服务类
  * </p>
  *
- * @author ${author}
+ * @author ${hasikiFire}
  * @since 2024/06/03
  */
 public interface UserService extends IService<User> {
@@ -56,4 +56,8 @@ public interface UserService extends IService<User> {
   RestResp<String> deleteUser(Integer status);
 
   RestResp<User> createUser(UserCreateDto user);
+
+  RestResp<String> getSubscribe();
+
+  String generateSubscribe();
 }

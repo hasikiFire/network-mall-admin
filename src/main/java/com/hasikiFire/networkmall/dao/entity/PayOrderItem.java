@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * 订单项表
  * </p>
  *
- * @author ${author}
+ * @author ${hasikiFire}
  * @since 2024/07/04
  */
 @TableName("pay_order_item")

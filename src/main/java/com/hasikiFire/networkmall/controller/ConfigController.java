@@ -7,15 +7,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
- * 推广链接表 前端控制器
+ * 配置表 前端控制器
  * </p>
  *
  * @author ${hasikiFire}
- * @since 2024/06/03
+ * @since 2024/12/09
  */
 @RestController
-@RequestMapping("/promotionLink")
-public class PromotionLinkController {
+@RequestMapping("/config")
+public class ConfigController {
 
 }
 

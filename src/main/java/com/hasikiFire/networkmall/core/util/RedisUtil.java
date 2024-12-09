@@ -1,5 +1,5 @@
 /*
- * @Author: hasikiFire
+ * @author: hasikiFire
  * @Date: 2024-06-13 14:15:33
  */
 package com.hasikiFire.networkmall.core.util;

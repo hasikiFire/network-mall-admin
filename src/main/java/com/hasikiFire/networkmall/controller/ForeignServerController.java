@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
  * 服务器信息表 前端控制器
  * </p>
  *
- * @author ${author}
+ * @author ${hasikiFire}
  * @since 2024/06/03
  */
 @RestController

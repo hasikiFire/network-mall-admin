@@ -15,7 +15,7 @@ public class SystemConfigConsts {
     /**
      * Http 请求认证 Header
      */
-    public static final String HTTP_AUTH_HEADER_NAME = "Authorization";
+    public static final String HTTP_AUTH_HEADER_NAME = "hasikiFireization";
 
     /**
      * 图片上传目录

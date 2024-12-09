@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * 订单表 服务类
  * </p>
  *
- * @author ${author}
+ * @author ${hasikiFire}
  * @since 2024/07/02
  */
 public interface PayOrderService extends IService<PayOrder> {

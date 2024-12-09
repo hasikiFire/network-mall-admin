@@ -1,16 +1,16 @@
 package com.hasikiFire.networkmall.service;
 
-import com.hasikiFire.networkmall.dao.entity.Roles;
+import com.hasikiFire.networkmall.dao.entity.Link;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
  * <p>
- *  服务类
+ * 订阅链接表 服务类
  * </p>
  *
  * @author ${hasikiFire}
- * @since 2024/06/03
+ * @since 2024/12/10
  */
-public interface RolesService extends IService<Roles> {
+public interface LinkService extends IService<Link> {
 
 }

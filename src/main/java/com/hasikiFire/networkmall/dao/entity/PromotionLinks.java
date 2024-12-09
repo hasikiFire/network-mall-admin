@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  * 推广链接表
  * </p>
  *
- * @author ${author}
+ * @author ${hasikiFire}
  * @since 2024/07/04
  */
 @TableName("promotion_links")
