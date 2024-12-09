@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  * 用户已购套餐记录表
  * </p>
  *
- * @author ${author}
+ * @author ${hasikiFire}
  * @since 2024/07/04
  */
 @TableName("usage_record")

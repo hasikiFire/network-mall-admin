@@ -232,3 +232,25 @@ CREATE TABLE audit_log (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '审计记录表';
+
+CREATE TABLE `config` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '配置ID',
+  `item` varchar(255) NOT NULL DEFAULT '' COMMENT '配置项',
+  `value` varchar(2048) NOT NULL DEFAULT '' COMMENT '配置值',
+  `is_public` tinyint(1) unsigned NOT NULL DEFAULT 0 COMMENT '是否为公共参数',
+  `type` varchar(16) NOT NULL DEFAULT '' COMMENT '配置值类型',
+  `mark` varchar(255) NOT NULL DEFAULT '' COMMENT '备注',
+  PRIMARY KEY (`id`),
+  KEY `item` (`item`),
+  KEY `class` (`class`),
+  KEY `is_public` (`is_public`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '配置表';
+
+CREATE TABLE `link` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '记录ID',
+  `token` varchar(255) NOT NULL DEFAULT '' COMMENT '订阅token',
+  `user_id` bigint(20) unsigned NOT NULL DEFAULT 0 COMMENT '用户ID',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `token` (`token`),
+  UNIQUE KEY `user_id` (`user_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '订阅链接表';

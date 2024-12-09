@@ -12,7 +12,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * 套餐表 Mapper 接口
  * </p>
  *
- * @author ${author}
+ * @author ${hasikiFire}
  * @since 2024/06/03
  */
 public interface PackageMapper extends BaseMapper<PackageItem> {

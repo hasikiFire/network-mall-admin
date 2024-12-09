@@ -1,5 +1,5 @@
 /*
- * @Author: hasikiFire
+ * @author: hasikiFire
  * @Date: 2024-06-13 11:42:31
  */
 package com.hasikiFire.networkmall.core.common.constant;

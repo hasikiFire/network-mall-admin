@@ -6,28 +6,31 @@ import java.io.Serializable;
 
 /**
  * <p>
- * 
+ * 订阅链接表
  * </p>
  *
  * @author ${hasikiFire}
- * @since 2024/07/04
+ * @since 2024/12/10
  */
-public class Roles implements Serializable {
+public class Link implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 记录ID
+     */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
+
+    /**
+     * 订阅token
+     */
+    private String token;
 
     /**
      * 用户ID
      */
     private Long userId;
-
-    /**
-     * admin:管理员，user（普通用户）
-     */
-    private String roleName;
 
 
     public Long getId() {
@@ -38,6 +41,14 @@ public class Roles implements Serializable {
         this.id = id;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     public Long getUserId() {
         return userId;
     }
@@ -46,20 +57,12 @@ public class Roles implements Serializable {
         this.userId = userId;
     }
 
-    public String getRoleName() {
-        return roleName;
-    }
-
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
-    }
-
     @Override
     public String toString() {
-        return "Roles{" +
+        return "Link{" +
         "id=" + id +
+        ", token=" + token +
         ", userId=" + userId +
-        ", roleName=" + roleName +
         "}";
     }
 }

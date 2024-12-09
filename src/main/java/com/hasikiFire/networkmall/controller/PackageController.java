@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
  * 套餐表 前端控制器
  * </p>
  *
- * @author ${author}
+ * @author ${hasikiFire}
  * @since 2024/06/03
  */
 @RestController

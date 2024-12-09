@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
  * 用户已购套餐记录表 前端控制器
  * </p>
  *
- * @author ${author}
+ * @author ${hasikiFire}
  * @since 2024/06/23
  */
 @RestController

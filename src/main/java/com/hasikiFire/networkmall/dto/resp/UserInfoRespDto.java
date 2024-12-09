@@ -1,5 +1,5 @@
 /*
- * @Author: hasikiFire
+ * @author: hasikiFire
  * @Date: 2024-06-13 10:01:09
  */
 package com.hasikiFire.networkmall.dto.resp;

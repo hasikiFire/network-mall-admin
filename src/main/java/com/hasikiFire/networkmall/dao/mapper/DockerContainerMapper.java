@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * docker容器信息表 Mapper 接口
  * </p>
  *
- * @author ${author}
+ * @author ${hasikiFire}
  * @since 2024/07/04
  */
 public interface DockerContainerMapper extends BaseMapper<DockerContainer> {

@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * 审计记录表 服务类
  * </p>
  *
- * @author ${author}
+ * @author ${hasikiFire}
  * @since 2024/06/03
  */
 public interface AuditLogService extends IService<AuditLog> {

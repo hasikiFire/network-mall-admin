@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * 用户表
  * </p>
  *
- * @author ${author}
+ * @author ${hasikiFire}
  * @since 2024/07/04
  */
 public class User implements Serializable {

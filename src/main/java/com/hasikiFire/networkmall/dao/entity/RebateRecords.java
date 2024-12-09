@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * 返利记录表
  * </p>
  *
- * @author ${author}
+ * @author ${hasikiFire}
  * @since 2024/07/04
  */
 @TableName("rebate_records")

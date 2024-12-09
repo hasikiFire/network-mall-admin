@@ -13,7 +13,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * 服务器信息表 服务类
  * </p>
  *
- * @author ${author}
+ * @author ${hasikiFire}
  * @since 2024/06/03
  */
 public interface ForeignServerService extends IService<ForeignServer> {

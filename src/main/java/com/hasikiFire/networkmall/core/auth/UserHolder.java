@@ -19,7 +19,7 @@ public class UserHolder {
     /**
      * 当前线程作家ID
      */
-    private static final ThreadLocal<Long> authorIdTL = new ThreadLocal<>();
+    private static final ThreadLocal<Long> hasikiFireIdTL = new ThreadLocal<>();
 
     public void setUserId(Long userId) {
         userIdTL.set(userId);
@@ -29,17 +29,17 @@ public class UserHolder {
         return userIdTL.get();
     }
 
-    public void setAuthorId(Long authorId) {
-        authorIdTL.set(authorId);
+    public void sethasikiFireId(Long hasikiFireId) {
+        hasikiFireIdTL.set(hasikiFireId);
     }
 
-    public Long getAuthorId() {
-        return authorIdTL.get();
+    public Long gethasikiFireId() {
+        return hasikiFireIdTL.get();
     }
 
     public void clear() {
         userIdTL.remove();
-        authorIdTL.remove();
+        hasikiFireIdTL.remove();
     }
 
 }
