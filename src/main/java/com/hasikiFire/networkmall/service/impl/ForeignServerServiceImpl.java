@@ -9,7 +9,6 @@ import com.hasikiFire.networkmall.dao.mapper.PackageMapper;
 import com.hasikiFire.networkmall.dto.req.ForeignEditReqDto;
 import com.hasikiFire.networkmall.dto.req.ForeignServerListReqDto;
 import com.hasikiFire.networkmall.dto.resp.ForeignServerListRespDto;
-import com.hasikiFire.networkmall.dto.resp.PackageListRespDto;
 import com.hasikiFire.networkmall.service.ForeignServerService;
 
 import lombok.RequiredArgsConstructor;
@@ -99,30 +98,16 @@ public class ForeignServerServiceImpl extends ServiceImpl<ForeignServerMapper, F
 
     IPage<ForeignServer> pPage = foreignServerMapper.selectPage(page, queryWrapper);
     List<ForeignServer> records = pPage.getRecords();
-    log.info("getUserPackageList pPage: {}", pPage);
     List<ForeignServerListRespDto> foreignServerListRespDto = records.stream().map(p -> {
-      return ForeignServerListRespDto.builder()
-            .foreignId(p.getId())
-            .serverName(p.getServerName())
-            .supplier(p.getSupplier())
-            .domainName(p.getDomainName())
-            .ipAddress(p.getIpAddress())
-            .startDate(p.getStartDate())
-            .monthlyFee(p.getMonthlyFee())
-            .totalMonthlyDataTransfer(p.getTotalMonthlyDataTransfer())
-            .consumedDataTransfer(p.getConsumedDataTransfer())
-            .operatingSystem(p.getOperatingSystem())
-            .cpuCores(p.getCpuCores())
-            .ramGb(p.getRamGb())
-            .remainingRamGb(p.getRemainingRamGb())
-            .storageGb(p.getStorageGb())
-            .consumedStorageGb(p.getConsumedStorageGb())
-            .status(p.getStatus())
-            .createdAt(p.getCreatedAt())
-            .updatedAt(p.getUpdatedAt())
-            .build();
+      return ForeignServerListRespDto.builder().foreignId(p.getId()).serverName(p.getServerName())
+          .supplier(p.getSupplier()).domainName(p.getDomainName()).ipAddress(p.getIpAddress())
+          .startDate(p.getStartDate()).monthlyFee(p.getMonthlyFee())
+          .totalMonthlyDataTransfer(p.getTotalMonthlyDataTransfer()).consumedDataTransfer(p.getConsumedDataTransfer())
+          .operatingSystem(p.getOperatingSystem()).storageGb(p.getStorageGb())
+          .consumedStorageGb(p.getConsumedStorageGb()).ramGb(p.getRamGb()).remainingRamGb(p.getRemainingRamGb())
+          .cpuCores(p.getCpuCores()).status(p.getStatus()).deleted(p.getDeleted()).createdAt(p.getCreatedAt())
+          .updatedAt(p.getUpdatedAt()).build();
     }).collect(Collectors.toList());
-
     return RestResp.ok(
         PageRespDto.of(params.getPageNum(), params.getPageSize(), page.getTotal(), foreignServerListRespDto));
 

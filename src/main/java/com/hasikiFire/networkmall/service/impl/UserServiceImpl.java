@@ -17,14 +17,13 @@ import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.core.util.PasswordUtils;
 import com.hasikiFire.networkmall.core.util.RedisUtil;
+import com.hasikiFire.networkmall.core.util.SnowflakeDistributeId;
 import com.hasikiFire.networkmall.dao.entity.Roles;
 import com.hasikiFire.networkmall.dao.entity.UsageRecord;
 import com.hasikiFire.networkmall.dao.entity.User;
-import com.hasikiFire.networkmall.dao.entity.UserId;
 import com.hasikiFire.networkmall.dao.entity.Wallet;
 import com.hasikiFire.networkmall.dao.mapper.RolesMapper;
 import com.hasikiFire.networkmall.dao.mapper.UsageRecordMapper;
-import com.hasikiFire.networkmall.dao.mapper.UserIdMapper;
 import com.hasikiFire.networkmall.dao.mapper.UserMapper;
 import com.hasikiFire.networkmall.dao.mapper.WalletMapper;
 import com.hasikiFire.networkmall.dto.req.UserCreateDto;
@@ -87,8 +86,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
   private final UserMapper userMapper;
 
-  private final UserIdMapper userIDMapper;
-
   private final WalletMapper walletMapper;
   private final RolesMapper roleMapper;
   private final UsageRecordMapper usageRecordMapper;
@@ -114,17 +111,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     // 删除验证码
     redisUtil.delete(redisKey);
     Roles role = new Roles();
-    role.setUserId(user.getUserId());
+    role.setUserId(user.getId());
     role.setRoleName(RoleEnum.USER.getRoleName());
     roleMapper.insert(role);
 
-    StpUtil.login(user.getUserId());
+    StpUtil.login(user.getId());
     String token = StpUtil.getTokenValue();
     // 生成JWT 并返回
     return RestResp.ok(
         UserRegisterRespDto.builder()
             .token(token)
-            .uid(user.getUserId())
+            .uid(user.getId())
             .build());
   }
 
@@ -145,13 +142,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
       throw new BusinessException("邮箱或者密码错误");
     }
 
-    StpUtil.login(user.getUserId());
+    StpUtil.login(user.getId());
     String token = StpUtil.getTokenValue();
 
     return RestResp.ok(
         UserLoginRespDto.builder()
             .token(token)
-            .uid(user.getUserId())
+            .uid(user.getId())
             .build());
 
   }
@@ -168,7 +165,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
     return RestResp.ok(
         UserInfoRespDto.builder()
-            .userId(user.getUserId())
+            .userId(user.getId())
             .name(user.getName())
             .email(user.getEmail())
             .createdAt(user.getCreatedAt())
@@ -203,7 +200,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<User>();
     queryWrapper.eq(User::getDeleted, 0);
     if (params.getUserId() != null) {
-      queryWrapper.eq(User::getUserId, params.getUserId());
+      queryWrapper.eq(User::getId, params.getUserId());
     }
     if (params.getName() != null) {
       queryWrapper.like(User::getName, params.getName());
@@ -220,7 +217,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     List<User> users = usersPage.getRecords();
 
     // 2. 获取所有的userId
-    List<Long> userIds = users.stream().map(User::getUserId).collect(Collectors.toList());
+    List<Long> userIds = users.stream().map(User::getId).collect(Collectors.toList());
     log.info("User IDs: {}", userIds);
     // 3. 根据userId查询wallet表, 取出balance和currency字段
     List<Wallet> wallets = walletMapper.selectList(new QueryWrapper<Wallet>().in("user_id", userIds)
@@ -238,13 +235,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         .collect(Collectors.groupingBy(UsageRecord::getUserId));
 
     List<UserListRespDto> userListRespDtos = users.stream().map(user -> {
-      Long userId = user.getUserId();
-      Wallet userWallet = userIdToWalletMap.get(userId); // 假设每个用户只有一个wallet
+      Long userId = user.getId();
+      Wallet userWallet = userIdToWalletMap.get(userId);
       List<UsageRecord> userPackageRecords = userIdToPackageRecordsMap.getOrDefault(userId,
           new ArrayList<>());
 
       return UserListRespDto.builder()
-          .userId(user.getUserId())
+          .userId(user.getId())
           .name(user.getName())
           .email(user.getEmail())
           .status(user.getStatus())
@@ -279,7 +276,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
       user = createNewUser((UserDto) dto);
     } else {
       LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
-      queryWrapper.eq(User::getUserId, dto.getUserId());
+      queryWrapper.eq(User::getId, dto.getUserId());
       user = userMapper.selectOne(queryWrapper);
       log.info("User: selectOne {}", user);
       if (user == null) {
@@ -335,18 +332,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     userMapper.updateById(oldUser);
     log.info("User: updateNewUser {}", oldUser);
-    // 随机取一个未使用的用户ID
-    LambdaQueryWrapper<UserId> queryWrapperUserID = new LambdaQueryWrapper<>();
-    queryWrapperUserID.eq(UserId::getUserId, newUserDtoser.getUserId());
-    UserId userIdModal = userIDMapper.selectOne(queryWrapperUserID);
-    if (userIdModal != null) {
-      userIdModal.setStatus(1);
-      userIDMapper.updateById(userIdModal);
-    } else {
-      log.info("用户userID 未在user_id 数据库里", userIdModal);
-    }
 
-    log.info("User: updateNewUser {}", oldUser);
     return oldUser;
   }
 
@@ -359,16 +345,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     if (userMapper.selectCount(queryWrapper) > 0) {
       throw new BusinessException("邮箱已被注册");
     }
-    // 随机取一个未使用的用户ID
-    QueryWrapper<UserId> queryWrapperUserID = new QueryWrapper<>();
-    queryWrapperUserID.eq("status", 0).orderByAsc("RAND()").last("LIMIT 1");
-    // TODO uuid
-    // UserId userIdModal = userIDMapper.selectOne(queryWrapperUserID);
-    // if (userIdModal == null) {
-    // throw new BusinessException("用户ID已用完");
-    // }
-    // userIdModal.setStatus(1);
-    // userIDMapper.updateById(userIdModal);
+
+    SnowflakeDistributeId idWorker = new SnowflakeDistributeId(0, 0);
+
     // Long userId = userIdModal.getUserId();
     // 注册成功，保存用户信息
     User user = new User();
@@ -388,7 +367,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         passwordHash);
     user.setName(dto.getName());
     user.setEmail(dto.getEmail());
-    // user.setUserId(userId);
+    user.setUuid(idWorker.nextId());
     user.setStatus(1);
     user.setSalt(salt);
     userMapper.insert(user);

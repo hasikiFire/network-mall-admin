@@ -174,7 +174,7 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
     if (packageItem == null) {
       throw new BusinessException("套餐不存在");
     }
-    User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getUserId, reqDto.getUserId()));
+    User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, reqDto.getUserId()));
     if (user == null) {
       throw new BusinessException("用户不存在");
     }

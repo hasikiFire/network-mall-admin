@@ -1,8 +1,6 @@
 CREATE TABLE `user` (
   -- 主键
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
-  -- 用户ID
-  `user_id` bigint NOT NULL UNIQUE COMMENT '用户ID',
   -- 名字
   `name` VARCHAR(255) NOT NULL COMMENT '名字',
   -- 邮箱
