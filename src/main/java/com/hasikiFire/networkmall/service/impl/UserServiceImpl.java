@@ -19,6 +19,7 @@ import com.hasikiFire.networkmall.core.util.PasswordUtils;
 import com.hasikiFire.networkmall.core.util.RedisUtil;
 import com.hasikiFire.networkmall.core.util.SnowflakeDistributeId;
 import com.hasikiFire.networkmall.core.util.TokenGenerator;
+import com.hasikiFire.networkmall.core.util.YamlBuilder;
 import com.hasikiFire.networkmall.dao.Proxy.ClashHttpProxy;
 import com.hasikiFire.networkmall.dao.entity.Config;
 import com.hasikiFire.networkmall.dao.entity.Link;
@@ -57,13 +58,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -484,32 +480,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
       log.info("[generateSubscribe] faild: {}", response.getMessage());
     }
 
-    User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, linkItem.getId()));
+    User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, linkItem.getUserId()));
     log.info("[generateSubscribe] 查询服务器记录条数: {}", records.size());
     for (ForeignServerListRespDto record : records) {
+      String name = user.getName() + "-" + user.getId();
       ClashHttpProxy clashHttpProxy = ClashHttpProxy.builder()
           .name(record.getServerName())
-          .server(record.getServerName())
+          .server(record.getDomainName())
           .port(record.getPort())
-          .username(user.getName())
+          .username(name)
           .password(user.getPasswordHash())
           .build();
 
       clashHttpProxies.add(clashHttpProxy);
     }
-    try {
-      // ObjectMapper objectMapper = new ObjectMapper();
-      // String jsonConfig = objectMapper.writeValueAsString(clashHttpProxies);
-      ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-      String yaml = yamlMapper.writeValueAsString(clashHttpProxies);
-      // 3. Base64 编码
-      // String result = Base64.getEncoder().encodeToString(test2.getBytes());
 
-      return yaml;
-      // return result;
-    } catch (JsonProcessingException e) {
-      e.printStackTrace();
-      return null;
-    }
+    String yamlContent = YamlBuilder.buildYaml(clashHttpProxies);
+    return yamlContent;
+
   }
 }

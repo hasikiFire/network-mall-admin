@@ -11,8 +11,6 @@ import com.hasikiFire.networkmall.dto.req.PackageListReqDto;
 import com.hasikiFire.networkmall.dto.resp.PackageListRespDto;
 import com.hasikiFire.networkmall.dto.resp.PackageRespDto;
 
-import jakarta.validation.Valid;
-
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
