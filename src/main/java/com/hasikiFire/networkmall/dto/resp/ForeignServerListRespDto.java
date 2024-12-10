@@ -21,6 +21,8 @@ public class ForeignServerListRespDto {
   @Schema(description = "服务器的域名(会变动)")
   private String domainName;
 
+  @Schema(description = "服务器的端口号")
+  private Integer port;
   @Schema(description = "服务器的IP地址(会变动)")
   private String ipAddress;
 

@@ -19,6 +19,7 @@ import com.hasikiFire.networkmall.core.util.PasswordUtils;
 import com.hasikiFire.networkmall.core.util.RedisUtil;
 import com.hasikiFire.networkmall.core.util.SnowflakeDistributeId;
 import com.hasikiFire.networkmall.core.util.TokenGenerator;
+import com.hasikiFire.networkmall.dao.Proxy.ClashHttpProxy;
 import com.hasikiFire.networkmall.dao.entity.Config;
 import com.hasikiFire.networkmall.dao.entity.Link;
 import com.hasikiFire.networkmall.dao.entity.Roles;
@@ -31,12 +32,14 @@ import com.hasikiFire.networkmall.dao.mapper.RolesMapper;
 import com.hasikiFire.networkmall.dao.mapper.UsageRecordMapper;
 import com.hasikiFire.networkmall.dao.mapper.UserMapper;
 import com.hasikiFire.networkmall.dao.mapper.WalletMapper;
+import com.hasikiFire.networkmall.dto.req.ForeignServerListReqDto;
 import com.hasikiFire.networkmall.dto.req.UserCreateDto;
 import com.hasikiFire.networkmall.dto.req.UserEditDto;
 import com.hasikiFire.networkmall.dto.req.UserListReqDto;
 import com.hasikiFire.networkmall.dto.req.UserLoginReqDto;
 import com.hasikiFire.networkmall.dto.req.UserRegisterReqDto;
 import com.hasikiFire.networkmall.dto.req.UsersendEmailCodeDto;
+import com.hasikiFire.networkmall.dto.resp.ForeignServerListRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserInfoRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserListRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserLoginRespDto;
@@ -54,9 +57,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -88,15 +95,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   @Value("${spring.mail.username}")
   private String username;
 
-  private final UserMapper userMapper;
-
   private final WalletMapper walletMapper;
   private final RolesMapper roleMapper;
   private final UsageRecordMapper usageRecordMapper;
   private final ForeignServerService foreignServerService;
   private final ConfigMapper configMapper;
   private final LinkMapper linkMapper;
-
+  private final UserMapper userMapper;
   @Autowired
   private RedisUtil redisUtil;
 
@@ -401,27 +406,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   public RestResp<String> getSubscribe() {
     // String token = "";
     // Long userID = Long.parseLong(StpUtil.getLoginId().toString());
-    // Link tempLink = linkMapper.selectOne(new QueryWrapper<Link>().eq("user_id", userID));
+    // Link tempLink = linkMapper.selectOne(new QueryWrapper<Link>().eq("user_id",
+    // userID));
     // if (tempLink != null) {
-    //   token = tempLink.getToken();
+    // token = tempLink.getToken();
     // } else {
-    //   token = TokenGenerator.generateToken();
-    //   Link newLink = new Link();
-    //   newLink.setToken(token);
-    //   newLink.setUserId(userID);
-    //   linkMapper.insert(newLink);
+    // token = TokenGenerator.generateToken();
+    // Link newLink = new Link();
+    // newLink.setToken(token);
+    // newLink.setUserId(userID);
+    // linkMapper.insert(newLink);
     // }
 
     // String subscribeHost = "";
-    // List<Config> subscribeConfigs = configMapper.selectList(new QueryWrapper<Config>().eq("type", "subscribe"));
+    // List<Config> subscribeConfigs = configMapper.selectList(new
+    // QueryWrapper<Config>().eq("type", "subscribe"));
     // // 使用传统的 for 循环
     // for (Config config : subscribeConfigs) {
-    //   if ("subscribeHost".equals(config.getItem())) {
-    //     subscribeHost = config.getValue();
-    //     break; // 如果只需要找到第一个匹配项，可以在这里跳出循环
-    //   }
+    // if ("subscribeHost".equals(config.getItem())) {
+    // subscribeHost = config.getValue();
+    // break; // 如果只需要找到第一个匹配项，可以在这里跳出循环
     // }
-    // String finalLink = "https://" + subscribeHost + "/user/subscribe" + "?token=" + token;
+    // }
+    // String finalLink = "https://" + subscribeHost + "/user/subscribe" + "?token="
+    // + token;
     // return RestResp.ok(finalLink);
 
     // // 获取当前用户ID
@@ -456,8 +464,52 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   }
 
   @Override
-  public String generateSubscribe() {
+  public String generateSubscribe(String token) {
+    Link linkItem = linkMapper.selectOne(new QueryWrapper<Link>().eq("token", token));
+    if (linkItem == null) {
+      throw new BusinessException("token不存在");
+    }
+    ForeignServerListReqDto reqdto = ForeignServerListReqDto.builder()
+        .status(1) // 其他属性
+        .build();
+    reqdto.setFetchAll(true); // 手动设置 fetchAll.
+    RestResp<PageRespDto<ForeignServerListRespDto>> response = foreignServerService.getForeignServerList(reqdto);
 
-    return null;
+    ArrayList<ClashHttpProxy> clashHttpProxies = new ArrayList<ClashHttpProxy>();
+
+    List<? extends ForeignServerListRespDto> records = new ArrayList<>();
+    if (response.getCode() == 200 && response.getData() != null) {
+      records = response.getData().getList();
+    } else {
+      log.info("[generateSubscribe] faild: {}", response.getMessage());
+    }
+
+    User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, linkItem.getId()));
+    log.info("[generateSubscribe] 查询服务器记录条数: {}", records.size());
+    for (ForeignServerListRespDto record : records) {
+      ClashHttpProxy clashHttpProxy = ClashHttpProxy.builder()
+          .name(record.getServerName())
+          .server(record.getServerName())
+          .port(record.getPort())
+          .username(user.getName())
+          .password(user.getPasswordHash())
+          .build();
+
+      clashHttpProxies.add(clashHttpProxy);
+    }
+    try {
+      // ObjectMapper objectMapper = new ObjectMapper();
+      // String jsonConfig = objectMapper.writeValueAsString(clashHttpProxies);
+      ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+      String yaml = yamlMapper.writeValueAsString(clashHttpProxies);
+      // 3. Base64 编码
+      // String result = Base64.getEncoder().encodeToString(test2.getBytes());
+
+      return yaml;
+      // return result;
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+      return null;
+    }
   }
 }

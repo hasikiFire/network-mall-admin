@@ -144,6 +144,7 @@ CREATE TABLE foreign_server (
   supplier VARCHAR(32) NOT NULL COMMENT '服务器的服务商',
   domain_name VARCHAR(255) COMMENT '服务器的域名(会变动)',
   ip_address VARCHAR(32) NOT NULL COMMENT '服务器的IP地址(会变动)',
+  port int unsigned DEFAULT NULL COMMENT '服务器的端口号',
   monthly_fee decimal(10, 6) NOT NULL COMMENT '每月费用，单位（美元）',
   -- discount DECIMAL(5, 2) COMMENT '折扣百分比',
   -- actual_fee decimal(10, 6) NOT NULL COMMENT '实际费用，单位（美元）',
