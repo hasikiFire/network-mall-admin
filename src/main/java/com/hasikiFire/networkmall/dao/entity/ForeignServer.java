@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 服务器信息表
+ * 
  * </p>
  *
  * @author ${hasikiFire}
- * @since 2024/07/04
+ * @since 2024/12/10
  */
 @TableName("foreign_server")
 public class ForeignServer implements Serializable {
@@ -45,6 +45,11 @@ public class ForeignServer implements Serializable {
      * 服务器的IP地址(会变动)
      */
     private String ipAddress;
+
+    /**
+     * 服务器的端口号
+     */
+    private Integer port;
 
     /**
      * 服务器启动日期
@@ -116,6 +121,7 @@ public class ForeignServer implements Serializable {
      */
     private LocalDateTime updatedAt;
 
+
     public Long getId() {
         return id;
     }
@@ -154,6 +160,14 @@ public class ForeignServer implements Serializable {
 
     public void setIpAddress(String ipAddress) {
         this.ipAddress = ipAddress;
+    }
+
+    public Integer getPort() {
+        return port;
+    }
+
+    public void setPort(Integer port) {
+        this.port = port;
     }
 
     public LocalDateTime getStartDate() {
@@ -271,25 +285,26 @@ public class ForeignServer implements Serializable {
     @Override
     public String toString() {
         return "ForeignServer{" +
-                "id=" + id +
-                ", serverName=" + serverName +
-                ", supplier=" + supplier +
-                ", domainName=" + domainName +
-                ", ipAddress=" + ipAddress +
-                ", startDate=" + startDate +
-                ", monthlyFee=" + monthlyFee +
-                ", totalMonthlyDataTransfer=" + totalMonthlyDataTransfer +
-                ", consumedDataTransfer=" + consumedDataTransfer +
-                ", operatingSystem=" + operatingSystem +
-                ", cpuCores=" + cpuCores +
-                ", ramGb=" + ramGb +
-                ", remainingRamGb=" + remainingRamGb +
-                ", storageGb=" + storageGb +
-                ", consumedStorageGb=" + consumedStorageGb +
-                ", status=" + status +
-                ", deleted=" + deleted +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                "}";
+        "id=" + id +
+        ", serverName=" + serverName +
+        ", supplier=" + supplier +
+        ", domainName=" + domainName +
+        ", ipAddress=" + ipAddress +
+        ", port=" + port +
+        ", startDate=" + startDate +
+        ", monthlyFee=" + monthlyFee +
+        ", totalMonthlyDataTransfer=" + totalMonthlyDataTransfer +
+        ", consumedDataTransfer=" + consumedDataTransfer +
+        ", operatingSystem=" + operatingSystem +
+        ", cpuCores=" + cpuCores +
+        ", ramGb=" + ramGb +
+        ", remainingRamGb=" + remainingRamGb +
+        ", storageGb=" + storageGb +
+        ", consumedStorageGb=" + consumedStorageGb +
+        ", status=" + status +
+        ", deleted=" + deleted +
+        ", createdAt=" + createdAt +
+        ", updatedAt=" + updatedAt +
+        "}";
     }
 }

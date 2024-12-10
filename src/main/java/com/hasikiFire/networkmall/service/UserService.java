@@ -59,5 +59,5 @@ public interface UserService extends IService<User> {
 
   RestResp<String> getSubscribe();
 
-  String generateSubscribe();
+  String generateSubscribe(String token);
 }

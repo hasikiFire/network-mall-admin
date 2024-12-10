@@ -106,7 +106,7 @@ public class ForeignServerServiceImpl extends ServiceImpl<ForeignServerMapper, F
           .operatingSystem(p.getOperatingSystem()).storageGb(p.getStorageGb())
           .consumedStorageGb(p.getConsumedStorageGb()).ramGb(p.getRamGb()).remainingRamGb(p.getRemainingRamGb())
           .cpuCores(p.getCpuCores()).status(p.getStatus()).deleted(p.getDeleted()).createdAt(p.getCreatedAt())
-          .updatedAt(p.getUpdatedAt()).build();
+          .updatedAt(p.getUpdatedAt()).port(p.getPort()).build();
     }).collect(Collectors.toList());
     return RestResp.ok(
         PageRespDto.of(params.getPageNum(), params.getPageSize(), page.getTotal(), foreignServerListRespDto));

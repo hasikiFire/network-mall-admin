@@ -2,6 +2,9 @@ package com.hasikiFire.networkmall.controller;
 
 import java.util.Map;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -60,6 +63,7 @@ public class UserController {
    */
   @Operation(summary = "用户信息查询接口")
   @GetMapping("/getUserInfo")
+  @SaCheckLogin
   public RestResp<UserInfoRespDto> getUserInfo(Long userId) {
     return userService.getUserInfo(userId);
   }
@@ -89,11 +93,23 @@ public class UserController {
     return userService.getSubscribe();
   }
 
-  @SaCheckLogin
-  @Operation(summary = "获取订阅链接")
-  @GetMapping("/subscribe")
-  public String generateSubscribe() {
-    return userService.generateSubscribe();
+  @Operation(summary = "生成订阅链接")
+  @GetMapping(value = "/subscribe", produces = { "text/html;charset=UTF-8" })
+  public ResponseEntity<String> generateSubscribe(String token) {
+    // return userService.generateSubscribe(token);
+    // 假设这里调用服务方法获取并压缩订阅内容
+
+    HttpHeaders headers = new HttpHeaders();
+    // 其他自定义响应头
+    // headers.set("Subscription-Userinfo", "upload=104857600; download=209715200;
+    // total=1073741824; expire=1704028800");
+    // headers.set("Content-Disposition", "attachment; filename=MyAppName.yaml");
+    // headers.set("Profile-Update-Interval", "6");
+    // headers.set("Profile-Web-Page-Url", "https://example.com");
+    // headers.set("Vary", "Accept-Encoding"); // 添加 Vary 头
+    // headers.set("Content-Encoding", "gzip");
+    String result = userService.generateSubscribe(token);
+    return new ResponseEntity<>(result, headers, HttpStatus.OK);
   }
   // @Operation(summary = "重置密码接口") TODO
   // @PostMapping("resetPassword")
