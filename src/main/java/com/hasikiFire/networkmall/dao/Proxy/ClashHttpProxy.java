@@ -12,4 +12,7 @@ public class ClashHttpProxy extends ClashProxy {
 
   @Builder.Default
   private String type = "http"; // 初始化默认值
+
+  @Builder.Default
+  private boolean tls = true; // 是否启用 TLS
 }
