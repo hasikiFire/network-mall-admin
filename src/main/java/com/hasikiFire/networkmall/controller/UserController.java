@@ -101,12 +101,10 @@ public class UserController {
 
     HttpHeaders headers = new HttpHeaders();
     // 其他自定义响应头
-    // headers.set("Subscription-Userinfo", "upload=104857600; download=209715200;
-    // total=1073741824; expire=1704028800");
-    // headers.set("Content-Disposition", "attachment; filename=MyAppName.yaml");
-    // headers.set("Profile-Update-Interval", "6");
-    // headers.set("Profile-Web-Page-Url", "https://example.com");
-    // headers.set("Vary", "Accept-Encoding"); // 添加 Vary 头
+    headers.set("Subscription-Userinfo", "upload=104857600; download=209715200;total=1073741824; expire=1704028800");
+    headers.set("Content-Disposition", "attachment; filename=HasikiFire");
+    headers.set("Profile-Update-Interval", "6");
+    headers.set("Profile-Web-Page-Url", "https://baidu.com");
     // headers.set("Content-Encoding", "gzip");
     String result = userService.generateSubscribe(token);
     return new ResponseEntity<>(result, headers, HttpStatus.OK);
