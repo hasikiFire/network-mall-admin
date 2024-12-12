@@ -78,7 +78,6 @@ public class User implements Serializable {
      */
     private Integer deleted;
 
-
     public Long getId() {
         return id;
     }
@@ -178,18 +177,18 @@ public class User implements Serializable {
     @Override
     public String toString() {
         return "User{" +
-        "id=" + id +
-        ", uuid=" + uuid +
-        ", name=" + name +
-        ", email=" + email +
-        ", passwordHash=" + passwordHash +
-        ", salt=" + salt +
-        ", status=" + status +
-        ", inviterUserId=" + inviterUserId +
-        ", inviteCode=" + inviteCode +
-        ", createdAt=" + createdAt +
-        ", updatedAt=" + updatedAt +
-        ", deleted=" + deleted +
-        "}";
+                "id=" + id +
+                ", uuid=" + uuid +
+                ", name=" + name +
+                ", email=" + email +
+                ", passwordHash=" + passwordHash +
+                ", salt=" + salt +
+                ", status=" + status +
+                ", inviterUserId=" + inviterUserId +
+                ", inviteCode=" + inviteCode +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", deleted=" + deleted +
+                "}";
     }
 }
