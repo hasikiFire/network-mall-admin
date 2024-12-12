@@ -483,12 +483,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, linkItem.getUserId()));
     log.info("[generateSubscribe] 查询服务器记录条数: {}", records.size());
     for (ForeignServerListRespDto record : records) {
-      String name = user.getName() + "-" + user.getId();
       ClashHttpProxy clashHttpProxy = ClashHttpProxy.builder()
           .name(record.getServerName())
           .server(record.getDomainName())
           .port(record.getPort())
-          .username(name)
+          .username(Long.toString(user.getId()))
           .password(user.getPasswordHash())
           .build();
 
