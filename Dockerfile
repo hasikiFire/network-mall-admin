@@ -23,7 +23,7 @@ FROM openjdk:17-jdk-slim AS app
 WORKDIR /app
 
 # 将构建的应用复制到新镜像
-COPY --from=builder /app/target/app.jar /app/app.jar
+COPY --from=builder /app/target/network-mall-admin.jar /app/app.jar
 
 # 暴露应用程序端口
 EXPOSE 8080

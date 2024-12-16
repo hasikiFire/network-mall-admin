@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 设置变量
-REPO_URL="https://github.com/hasikiFire/network-mall-admin"
+REPO_URL="https://github.com/hasikiFire/network-mall-admin.git"
 PROJECT_NAME="network-mall-admin"
 HOST_PORT=29999
 CONFIG_FILE="./application-prod.yml" # 生产环境配置文件的路径

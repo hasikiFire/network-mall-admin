@@ -1,6 +1,7 @@
 CREATE TABLE `user` (
   -- 主键
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  uuid bigint NOT NULL COMMENT '用户ID',
   -- 名字
   `name` VARCHAR(255) NOT NULL COMMENT '名字',
   -- 邮箱
@@ -16,7 +17,8 @@ CREATE TABLE `user` (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` tinyint(2) DEFAULT '0' COMMENT '是否已删除 1：已删除 0：未删除',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  PRIMARY KEY (`uuid`),
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '用户表';
 
 CREATE TABLE `roles` (
