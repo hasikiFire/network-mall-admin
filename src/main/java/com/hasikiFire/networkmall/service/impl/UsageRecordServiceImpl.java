@@ -59,8 +59,10 @@ public class UsageRecordServiceImpl extends ServiceImpl<UsageRecordMapper, Usage
     usageRecord.setPurchaseEndTime(params.getPurchaseEndTime());
     // TODO speedLimit
     usageRecord.setConsumedDataTransfer(0);
-    String link = generaLink(params.getUserId());
-    usageRecord.setSubscriptionLink(link);
+    usageRecord.setDeviceNum(params.getDeviceNum());
+    usageRecord.setDataAllowance(params.getDataAllowance());
+    // usageRecord.setDeviceNum(params.getDeviceNum());
+
     try {
       usageRecordMapper.insert(usageRecord);
       // 插入记录后，监听服务器会自动识别
@@ -72,9 +74,4 @@ public class UsageRecordServiceImpl extends ServiceImpl<UsageRecordMapper, Usage
     return usageRecord;
   }
 
-  private String generaLink(Long userID) {
-    log.info(userID.toString());
-    // TODO 订阅链接是啥玩意，包干啥啊？
-    return "https://www.baidu.com";
-  }
 }

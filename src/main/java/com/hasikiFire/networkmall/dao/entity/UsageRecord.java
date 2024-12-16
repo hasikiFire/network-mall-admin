@@ -46,7 +46,7 @@ public class UsageRecord implements Serializable {
     private Long userId;
 
     /**
-     * 套餐状态 0:未开始 1：生效中 2：流量已用尽 3：已过期 
+     * 套餐状态 0:未开始 1：生效中 2：流量已用尽 3：已过期
      */
     private Integer purchaseStatus;
 
@@ -64,16 +64,14 @@ public class UsageRecord implements Serializable {
      * 用户已消耗的流量（以GB为单位）
      */
     private Integer consumedDataTransfer;
-
     /**
-     * 在线的设备数量
+     * 用户已消耗的流量（以GB为单位）
+     */
+    private Integer dataAllowance;
+    /**
+     * 数据流量限额（单位：GB）
      */
     private Integer deviceNum;
-
-    /**
-     * 订阅链接
-     */
-    private String subscriptionLink;
 
     /**
      * Docker容器name。格式：用户名称_套餐主键_计划主键
@@ -94,7 +92,6 @@ public class UsageRecord implements Serializable {
      * 是否已删除 1：已删除 0：未删除
      */
     private Integer deleted;
-
 
     public Long getId() {
         return id;
@@ -176,14 +173,6 @@ public class UsageRecord implements Serializable {
         this.deviceNum = deviceNum;
     }
 
-    public String getSubscriptionLink() {
-        return subscriptionLink;
-    }
-
-    public void setSubscriptionLink(String subscriptionLink) {
-        this.subscriptionLink = subscriptionLink;
-    }
-
     public String getDockerContainerName() {
         return dockerContainerName;
     }
@@ -215,25 +204,33 @@ public class UsageRecord implements Serializable {
     public void setDeleted(Integer deleted) {
         this.deleted = deleted;
     }
+    
+    public Integer getDataAllowance() {
+        return dataAllowance;
+    }
+
+    public void setDataAllowance(Integer data) {
+        this.dataAllowance = data;
+    }
 
     @Override
     public String toString() {
         return "UsageRecord{" +
-        "id=" + id +
-        ", packageId=" + packageId +
-        ", orderCode=" + orderCode +
-        ", orderItemId=" + orderItemId +
-        ", userId=" + userId +
-        ", purchaseStatus=" + purchaseStatus +
-        ", purchaseStartTime=" + purchaseStartTime +
-        ", purchaseEndTime=" + purchaseEndTime +
-        ", consumedDataTransfer=" + consumedDataTransfer +
-        ", deviceNum=" + deviceNum +
-        ", subscriptionLink=" + subscriptionLink +
-        ", dockerContainerName=" + dockerContainerName +
-        ", createdAt=" + createdAt +
-        ", updatedAt=" + updatedAt +
-        ", deleted=" + deleted +
-        "}";
+                "id=" + id +
+                ", packageId=" + packageId +
+                ", orderCode=" + orderCode +
+                ", orderItemId=" + orderItemId +
+                ", userId=" + userId +
+                ", purchaseStatus=" + purchaseStatus +
+                ", purchaseStartTime=" + purchaseStartTime +
+                ", purchaseEndTime=" + purchaseEndTime +
+                ", consumedDataTransfer=" + consumedDataTransfer +
+                ", dataAllowance=" + dataAllowance +
+                ", deviceNum=" + deviceNum +
+                ", dockerContainerName=" + dockerContainerName +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", deleted=" + deleted +
+                "}";
     }
 }

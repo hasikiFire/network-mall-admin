@@ -22,7 +22,7 @@
 		<jjwt.version>0.11.5</jjwt.version>
 		<!-- <xxl-job.version>2.3.1</xxl-job.version> -->
 		<redisson.version>3.19.1</redisson.version>
-		<spring-boot-admin.version>3.0.0-M1</spring-boot-admin.version>
+		<spring-boot-admin.version>3.0.0</spring-boot-admin.version>
 		<springdoc-openapi.version>2.5.0</springdoc-openapi.version>
 		<sa-token-spring-boot3-starter.version>1.38.0</sa-token-spring-boot3-starter.version>
 		<jjwt.version>0.11.5</jjwt.version>
