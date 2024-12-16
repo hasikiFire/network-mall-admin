@@ -151,7 +151,7 @@ CREATE TABLE foreign_server (
   -- discount DECIMAL(5, 2) COMMENT '折扣百分比',
   -- actual_fee decimal(10, 6) NOT NULL COMMENT '实际费用，单位（美元）',
   total_monthly_data_transfer INT COMMENT '服务器每月的总流量（以GB为单位）',
-  consumed_data_transfer INT COMMENT '服务器已消耗的流量（以GB为单位）',
+  consumed_data_transfer INT COMMENT '用户已消耗的流量（以MB为单位）',
   operating_system VARCHAR(255) COMMENT '服务器的操作系统',
   cpu_cores INT COMMENT '服务器的CPU核心数',
   ram_gb INT COMMENT '服务器的总RAM大小（以GB为单位）',
