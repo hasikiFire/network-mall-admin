@@ -29,18 +29,10 @@ public class UsageRecordAddReqDto {
   @NotNull(message = " 结束日期不能为空")
   private LocalDateTime purchaseEndTime;
 
-  // @Schema(description = "用户已消耗的流量（以GB为单位）", required = true)
-  // private Integer consumedDataTransfer;
+  @Schema(description = "在线的设备数量")
+  private Integer deviceNum;
 
-  // @Schema(description = "套餐状态 0:未开始 1：生效中 2：流量已用尽 3：已过期", required = true)
-  // private Integer purchaseStatus;
+  @Schema(description = "用户已消耗的流量（以GB为单位）")
+  private Integer dataAllowance;
 
-  // @Schema(description = "在线的设备数量", required = true)
-  // private Integer deviceNum;
-
-  // @Schema(description = "订阅链接", required = true)
-  // private String subscriptionLink;
-
-  // @Schema(description = "Docker容器name。格式：用户名称_套餐主键_计划主键", required = true)
-  // private String dockerContainerName;
 }

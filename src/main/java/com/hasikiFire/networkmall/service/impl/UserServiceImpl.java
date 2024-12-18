@@ -473,9 +473,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     ArrayList<ClashHttpProxy> clashHttpProxies = new ArrayList<ClashHttpProxy>();
 
-    List<? extends ForeignServerListRespDto> records = new ArrayList<>();
+    List<ForeignServerListRespDto> records = new ArrayList<>();
     if (response.getCode() == 200 && response.getData() != null) {
-      records = response.getData().getList();
+      records = (List<ForeignServerListRespDto>) response.getData().getList();
     } else {
       log.info("[generateSubscribe] faild: {}", response.getMessage());
     }
