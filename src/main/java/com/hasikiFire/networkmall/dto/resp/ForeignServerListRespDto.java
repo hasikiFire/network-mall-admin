@@ -33,10 +33,10 @@ public class ForeignServerListRespDto {
   private BigDecimal monthlyFee;
 
   @Schema(description = "服务器每月的总流量（以GB为单位）")
-  private Integer totalMonthlyDataTransfer;
+  private Long totalMonthlyDataTransfer;
 
   @Schema(description = "服务器已消耗的流量（以GB为单位）")
-  private Integer consumedDataTransfer;
+  private Long consumedDataTransfer;
 
   @Schema(description = "服务器的操作系统")
   private String operatingSystem;
@@ -45,22 +45,22 @@ public class ForeignServerListRespDto {
   private Integer cpuCores;
 
   @Schema(description = "服务器的总RAM大小（以GB为单位）")
-  private Integer ramGb;
+  private BigDecimal ramGb;
 
   @Schema(description = "服务器剩余的RAM大小（以GB为单位）")
-  private Integer remainingRamGb;
+  private BigDecimal remainingRamGb;
 
   @Schema(description = "服务器的总存储大小（以GB为单位）")
-  private Integer storageGb;
+  private BigDecimal storageGb;
 
   @Schema(description = "服务器已使用的存储大小（以GB为单位）")
-  private Integer consumedStorageGb;
+  private BigDecimal consumedStorageGb;
 
   @Schema(description = "服务器的状态。0: 停止 1：活动，2：过期")
   private Integer status;
 
   @Schema(description = "是否已删除 1：已删除 0：未删除")
-  private Integer deleted;
+  private Boolean deleted;
 
   @Schema(description = "创建时间")
   private LocalDateTime createdAt;

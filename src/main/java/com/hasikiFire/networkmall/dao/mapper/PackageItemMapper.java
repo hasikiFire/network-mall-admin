@@ -5,11 +5,11 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * <p>
- * 套餐表 Mapper 接口
+ *  Mapper 接口
  * </p>
  *
- * @author ${hasikiFire}
- * @since 2024/07/04
+ * @author ${author}
+ * @since 2024/12/23
  */
 public interface PackageItemMapper extends BaseMapper<PackageItem> {
 

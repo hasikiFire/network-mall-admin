@@ -4,15 +4,16 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
  * <p>
- * 用户已购套餐记录表
+ * 
  * </p>
  *
- * @author ${hasikiFire}
- * @since 2024/07/04
+ * @author ${author}
+ * @since 2024/12/23
  */
 @TableName("usage_record")
 public class UsageRecord implements Serializable {
@@ -36,17 +37,12 @@ public class UsageRecord implements Serializable {
     private String orderCode;
 
     /**
-     * 订单项，包含商品信息
-     */
-    private String orderItemId;
-
-    /**
      * 用户ID
      */
     private Long userId;
 
     /**
-     * 套餐状态 0:未开始 1：生效中 2：流量已用尽 3：已过期
+     * 套餐状态 0:未开始 1：生效中 2：流量已用尽 3：已过期 
      */
     private Integer purchaseStatus;
 
@@ -61,22 +57,29 @@ public class UsageRecord implements Serializable {
     private LocalDateTime purchaseEndTime;
 
     /**
-     * 用户已消耗的流量（以GB为单位）
+     * 数据流量限额（单位：B）
      */
-    private Integer consumedDataTransfer;
+    private Long dataAllowance;
+
     /**
-     * 用户已消耗的流量（以GB为单位）
+     * 用户已消耗的流量（单位：B）
      */
-    private Integer dataAllowance;
+    private Long consumedDataTransfer;
+
     /**
-     * 数据流量限额（单位：GB）
+     * 流量速率限额（单位：B）
+     */
+    private Long speedLimit;
+
+    /**
+     * 在线的设备数量
      */
     private Integer deviceNum;
 
     /**
-     * Docker容器name。格式：用户名称_套餐主键_计划主键
+     * 订阅链接
      */
-    private String dockerContainerName;
+    private String subscriptionLink;
 
     /**
      * 创建时间
@@ -92,6 +95,7 @@ public class UsageRecord implements Serializable {
      * 是否已删除 1：已删除 0：未删除
      */
     private Integer deleted;
+
 
     public Long getId() {
         return id;
@@ -115,14 +119,6 @@ public class UsageRecord implements Serializable {
 
     public void setOrderCode(String orderCode) {
         this.orderCode = orderCode;
-    }
-
-    public String getOrderItemId() {
-        return orderItemId;
-    }
-
-    public void setOrderItemId(String orderItemId) {
-        this.orderItemId = orderItemId;
     }
 
     public Long getUserId() {
@@ -157,12 +153,28 @@ public class UsageRecord implements Serializable {
         this.purchaseEndTime = purchaseEndTime;
     }
 
-    public Integer getConsumedDataTransfer() {
+    public Long getDataAllowance() {
+        return dataAllowance;
+    }
+
+    public void setDataAllowance(Long dataAllowance) {
+        this.dataAllowance = dataAllowance;
+    }
+
+    public Long getConsumedDataTransfer() {
         return consumedDataTransfer;
     }
 
-    public void setConsumedDataTransfer(Integer consumedDataTransfer) {
+    public void setConsumedDataTransfer(Long consumedDataTransfer) {
         this.consumedDataTransfer = consumedDataTransfer;
+    }
+
+    public Long getSpeedLimit() {
+        return speedLimit;
+    }
+
+    public void setSpeedLimit(Long speedLimit) {
+        this.speedLimit = speedLimit;
     }
 
     public Integer getDeviceNum() {
@@ -173,12 +185,12 @@ public class UsageRecord implements Serializable {
         this.deviceNum = deviceNum;
     }
 
-    public String getDockerContainerName() {
-        return dockerContainerName;
+    public String getSubscriptionLink() {
+        return subscriptionLink;
     }
 
-    public void setDockerContainerName(String dockerContainerName) {
-        this.dockerContainerName = dockerContainerName;
+    public void setSubscriptionLink(String subscriptionLink) {
+        this.subscriptionLink = subscriptionLink;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -204,33 +216,25 @@ public class UsageRecord implements Serializable {
     public void setDeleted(Integer deleted) {
         this.deleted = deleted;
     }
-    
-    public Integer getDataAllowance() {
-        return dataAllowance;
-    }
-
-    public void setDataAllowance(Integer data) {
-        this.dataAllowance = data;
-    }
 
     @Override
     public String toString() {
         return "UsageRecord{" +
-                "id=" + id +
-                ", packageId=" + packageId +
-                ", orderCode=" + orderCode +
-                ", orderItemId=" + orderItemId +
-                ", userId=" + userId +
-                ", purchaseStatus=" + purchaseStatus +
-                ", purchaseStartTime=" + purchaseStartTime +
-                ", purchaseEndTime=" + purchaseEndTime +
-                ", consumedDataTransfer=" + consumedDataTransfer +
-                ", dataAllowance=" + dataAllowance +
-                ", deviceNum=" + deviceNum +
-                ", dockerContainerName=" + dockerContainerName +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", deleted=" + deleted +
-                "}";
+        "id=" + id +
+        ", packageId=" + packageId +
+        ", orderCode=" + orderCode +
+        ", userId=" + userId +
+        ", purchaseStatus=" + purchaseStatus +
+        ", purchaseStartTime=" + purchaseStartTime +
+        ", purchaseEndTime=" + purchaseEndTime +
+        ", dataAllowance=" + dataAllowance +
+        ", consumedDataTransfer=" + consumedDataTransfer +
+        ", speedLimit=" + speedLimit +
+        ", deviceNum=" + deviceNum +
+        ", subscriptionLink=" + subscriptionLink +
+        ", createdAt=" + createdAt +
+        ", updatedAt=" + updatedAt +
+        ", deleted=" + deleted +
+        "}";
     }
 }

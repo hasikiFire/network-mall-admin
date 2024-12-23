@@ -58,7 +58,7 @@ public class UsageRecordServiceImpl extends ServiceImpl<UsageRecordMapper, Usage
     usageRecord.setPurchaseStartTime(params.getPurchaseStartTime());
     usageRecord.setPurchaseEndTime(params.getPurchaseEndTime());
     // TODO speedLimit
-    usageRecord.setConsumedDataTransfer(0);
+    usageRecord.setConsumedDataTransfer(0L);
     usageRecord.setDeviceNum(params.getDeviceNum());
     usageRecord.setDataAllowance(params.getDataAllowance());
     // usageRecord.setDeviceNum(params.getDeviceNum());

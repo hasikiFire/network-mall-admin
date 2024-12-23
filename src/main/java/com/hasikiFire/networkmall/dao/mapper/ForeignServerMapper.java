@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author ${author}
- * @since 2024/12/10
+ * @since 2024/12/23
  */
 public interface ForeignServerMapper extends BaseMapper<ForeignServer> {
 

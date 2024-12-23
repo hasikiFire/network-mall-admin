@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
  * 
  * </p>
  *
- * @author ${hasikiFire}
- * @since 2024/12/10
+ * @author ${author}
+ * @since 2024/12/23
  */
 @TableName("foreign_server")
 public class ForeignServer implements Serializable {
@@ -47,7 +47,7 @@ public class ForeignServer implements Serializable {
     private String ipAddress;
 
     /**
-     * 服务器的端口号
+     * 服务器的端口号(会变动)
      */
     private Integer port;
 
@@ -62,14 +62,14 @@ public class ForeignServer implements Serializable {
     private BigDecimal monthlyFee;
 
     /**
-     * 服务器每月的总流量（以GB为单位）
+     * 服务器每月默认总流量（单位：B）
      */
-    private Integer totalMonthlyDataTransfer;
+    private Long totalMonthlyDataTransfer;
 
     /**
-     * 服务器已消耗的流量（以GB为单位）
+     * 服务器已消耗的流量（单位：B）
      */
-    private Integer consumedDataTransfer;
+    private Long consumedDataTransfer;
 
     /**
      * 服务器的操作系统
@@ -82,24 +82,24 @@ public class ForeignServer implements Serializable {
     private Integer cpuCores;
 
     /**
-     * 服务器的总RAM大小（以GB为单位）
+     * 服务器的总RAM大小（单位：GB）
      */
-    private Integer ramGb;
+    private BigDecimal ramGb;
 
     /**
-     * 服务器剩余的RAM大小（以GB为单位）
+     * 服务器剩余的RAM大小（单位：GB）
      */
-    private Integer remainingRamGb;
+    private BigDecimal remainingRamGb;
 
     /**
-     * 服务器的总存储大小（以GB为单位）
+     * 服务器的总存储大小（单位：GB）
      */
-    private Integer storageGb;
+    private BigDecimal storageGb;
 
     /**
-     * 服务器已使用的存储大小（以GB为单位）
+     * 服务器已使用的存储大小（单位：GB）
      */
-    private Integer consumedStorageGb;
+    private BigDecimal consumedStorageGb;
 
     /**
      * 服务器的状态。0: 停止 1：活动，2：过期
@@ -107,9 +107,14 @@ public class ForeignServer implements Serializable {
     private Integer status;
 
     /**
+     * 是否超过默认流量包限额(1：是，0：否)
+     */
+    private Integer isBeyondTransfer;
+
+    /**
      * 是否已删除 1：已删除 0：未删除
      */
-    private Integer deleted;
+    private Boolean deleted;
 
     /**
      * 创建时间
@@ -186,19 +191,19 @@ public class ForeignServer implements Serializable {
         this.monthlyFee = monthlyFee;
     }
 
-    public Integer getTotalMonthlyDataTransfer() {
+    public Long getTotalMonthlyDataTransfer() {
         return totalMonthlyDataTransfer;
     }
 
-    public void setTotalMonthlyDataTransfer(Integer totalMonthlyDataTransfer) {
+    public void setTotalMonthlyDataTransfer(Long totalMonthlyDataTransfer) {
         this.totalMonthlyDataTransfer = totalMonthlyDataTransfer;
     }
 
-    public Integer getConsumedDataTransfer() {
+    public Long getConsumedDataTransfer() {
         return consumedDataTransfer;
     }
 
-    public void setConsumedDataTransfer(Integer consumedDataTransfer) {
+    public void setConsumedDataTransfer(Long consumedDataTransfer) {
         this.consumedDataTransfer = consumedDataTransfer;
     }
 
@@ -218,35 +223,35 @@ public class ForeignServer implements Serializable {
         this.cpuCores = cpuCores;
     }
 
-    public Integer getRamGb() {
+    public BigDecimal getRamGb() {
         return ramGb;
     }
 
-    public void setRamGb(Integer ramGb) {
+    public void setRamGb(BigDecimal ramGb) {
         this.ramGb = ramGb;
     }
 
-    public Integer getRemainingRamGb() {
+    public BigDecimal getRemainingRamGb() {
         return remainingRamGb;
     }
 
-    public void setRemainingRamGb(Integer remainingRamGb) {
+    public void setRemainingRamGb(BigDecimal remainingRamGb) {
         this.remainingRamGb = remainingRamGb;
     }
 
-    public Integer getStorageGb() {
+    public BigDecimal getStorageGb() {
         return storageGb;
     }
 
-    public void setStorageGb(Integer storageGb) {
+    public void setStorageGb(BigDecimal storageGb) {
         this.storageGb = storageGb;
     }
 
-    public Integer getConsumedStorageGb() {
+    public BigDecimal getConsumedStorageGb() {
         return consumedStorageGb;
     }
 
-    public void setConsumedStorageGb(Integer consumedStorageGb) {
+    public void setConsumedStorageGb(BigDecimal consumedStorageGb) {
         this.consumedStorageGb = consumedStorageGb;
     }
 
@@ -258,11 +263,19 @@ public class ForeignServer implements Serializable {
         this.status = status;
     }
 
-    public Integer getDeleted() {
+    public Integer getIsBeyondTransfer() {
+        return isBeyondTransfer;
+    }
+
+    public void setIsBeyondTransfer(Integer isBeyondTransfer) {
+        this.isBeyondTransfer = isBeyondTransfer;
+    }
+
+    public Boolean getDeleted() {
         return deleted;
     }
 
-    public void setDeleted(Integer deleted) {
+    public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
     }
 
@@ -302,6 +315,7 @@ public class ForeignServer implements Serializable {
         ", storageGb=" + storageGb +
         ", consumedStorageGb=" + consumedStorageGb +
         ", status=" + status +
+        ", isBeyondTransfer=" + isBeyondTransfer +
         ", deleted=" + deleted +
         ", createdAt=" + createdAt +
         ", updatedAt=" + updatedAt +

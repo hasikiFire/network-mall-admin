@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 套餐表
+ * 
  * </p>
  *
- * @author ${hasikiFire}
- * @since 2024/07/04
+ * @author ${author}
+ * @since 2024/12/23
  */
 @TableName("package_item")
 public class PackageItem implements Serializable {
@@ -67,9 +67,9 @@ public class PackageItem implements Serializable {
     private LocalDateTime discountEndDate;
 
     /**
-     * 数据流量限额（单位：GB）
+     * 数据流量限额（单位：B）
      */
-    private Integer dataAllowance;
+    private Long dataAllowance;
 
     /**
      * 设备数量限制
@@ -77,7 +77,7 @@ public class PackageItem implements Serializable {
     private Integer deviceLimit;
 
     /**
-     * 速率限制（单位：Mbps）
+     * 速率限制（单位：MB）
      */
     private Integer speedLimit;
 
@@ -169,11 +169,11 @@ public class PackageItem implements Serializable {
         this.discountEndDate = discountEndDate;
     }
 
-    public Integer getDataAllowance() {
+    public Long getDataAllowance() {
         return dataAllowance;
     }
 
-    public void setDataAllowance(Integer dataAllowance) {
+    public void setDataAllowance(Long dataAllowance) {
         this.dataAllowance = dataAllowance;
     }
 

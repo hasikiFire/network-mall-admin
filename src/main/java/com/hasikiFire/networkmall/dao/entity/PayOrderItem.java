@@ -79,7 +79,7 @@ public class PayOrderItem implements Serializable {
     /**
      * 数据流量限额（单位：GB）
      */
-    private Integer dataAllowance;
+    private Long dataAllowance;
 
     /**
      * 设备数量限制
@@ -195,11 +195,11 @@ public class PayOrderItem implements Serializable {
         this.discountEndDate = discountEndDate;
     }
 
-    public Integer getDataAllowance() {
+    public Long getDataAllowance() {
         return dataAllowance;
     }
 
-    public void setDataAllowance(Integer dataAllowance) {
+    public void setDataAllowance(Long dataAllowance) {
         this.dataAllowance = dataAllowance;
     }
 

@@ -39,8 +39,8 @@ public class PackageListRespDto {
   @Schema(description = "折扣结束日期")
   private LocalDateTime discountEndDate;
 
-  @Schema(description = "数据流量限额（单位：GB）。无值表示无限制")
-  private Integer dataAllowance;
+  @Schema(description = "数据流量限额（单位：B）。无值表示无限制")
+  private Long dataAllowance;
 
   @Schema(description = "设备数量限制。无值表示无限制")
   private Integer deviceLimit;

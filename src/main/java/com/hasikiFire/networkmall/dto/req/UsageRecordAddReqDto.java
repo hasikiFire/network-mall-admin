@@ -32,7 +32,7 @@ public class UsageRecordAddReqDto {
   @Schema(description = "在线的设备数量")
   private Integer deviceNum;
 
-  @Schema(description = "用户已消耗的流量（以GB为单位）")
-  private Integer dataAllowance;
+  @Schema(description = "用户已消耗的流量（以B为单位）")
+  private Long dataAllowance;
 
 }

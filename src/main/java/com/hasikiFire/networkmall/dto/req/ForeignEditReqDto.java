@@ -54,16 +54,16 @@ public class ForeignEditReqDto {
   private BigDecimal monthlyFee;
 
   /**
-   * 服务器每月的总流量（以GB为单位）
+   * 服务器每月的总流量（以B为单位）
    */
-  @Schema(description = "服务器每月的总流量（以GB为单位）")
-  private Integer totalMonthlyDataTransfer;
+  @Schema(description = "服务器每月的总流量（以B为单位）")
+  private Long totalMonthlyDataTransfer;
 
   /**
-   * 服务器已消耗的流量（以GB为单位）
+   * 服务器已消耗的流量（以B为单位）
    */
-  @Schema(description = "服务器已消耗的流量（以GB为单位）")
-  private Integer consumedDataTransfer;
+  @Schema(description = "服务器已消耗的流量（以B为单位）")
+  private Long consumedDataTransfer;
 
   /**
    * 服务器的操作系统
@@ -81,25 +81,25 @@ public class ForeignEditReqDto {
    * 服务器的总RAM大小（以GB为单位）
    */
   @Schema(description = "服务器的总RAM大小（以GB为单位）")
-  private Integer ramGb;
+  private BigDecimal ramGb;
 
   /**
    * 服务器剩余的RAM大小（以GB为单位）
    */
   @Schema(description = "服务器剩余的RAM大小（以GB为单位）")
-  private Integer remainingRamGb;
+  private BigDecimal remainingRamGb;
 
   /**
    * 服务器的总存储大小（以GB为单位）
    */
   @Schema(description = "服务器的总存储大小（以GB为单位）")
-  private Integer storageGb;
+  private BigDecimal storageGb;
 
   /**
    * 服务器已使用的存储大小（以GB为单位）
    */
   @Schema(description = "服务器已使用的存储大小（以GB为单位）")
-  private Integer consumedStorageGb;
+  private BigDecimal consumedStorageGb;
 
   /**
    * 服务器的状态。0: 停止 1：活动，2：过期

@@ -80,7 +80,7 @@ public class ForeignServerServiceImpl extends ServiceImpl<ForeignServerMapper, F
     if (serverItem == null) {
       return RestResp.fail("服务器不存在");
     }
-    serverItem.setDeleted(1);
+    serverItem.setDeleted(true);
     serverItem.setStatus(2);
     foreignServerMapper.updateById(serverItem);
     log.info("删除服务器信息成功，id={}", serverItem.getId());

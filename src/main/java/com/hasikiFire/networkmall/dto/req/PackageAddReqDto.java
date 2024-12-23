@@ -46,7 +46,7 @@ public class PackageAddReqDto {
   @Schema(description = "数据额度，单位GB", required = true)
   @NotNull(message = "数据额度不能为空")
 
-  private Integer dataAllowance;
+  private Long dataAllowance;
 
   @Schema(description = "设备限制数量，不传则不限制")
   private Integer deviceLimit;
