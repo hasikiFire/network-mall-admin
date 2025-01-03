@@ -365,15 +365,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     if (dto.getEmail() == null) {
       throw new BusinessException("邮箱不能为空");
     }
-    if (dto.getName() == null) {
-      throw new BusinessException("名字不能为空");
-    }
+
     String salt = PasswordUtils.generateSalt();
     String passwordHash = DigestUtils.md5DigestAsHex(
         (dto.getPassword() + salt).getBytes(StandardCharsets.UTF_8));
     user.setPasswordHash(
         passwordHash);
-    user.setName(dto.getName());
+    user.setName(dto.getName() == null ? "User" : dto.getName());
     user.setEmail(dto.getEmail());
     user.setUuid(idWorker.nextId());
     user.setStatus(1);

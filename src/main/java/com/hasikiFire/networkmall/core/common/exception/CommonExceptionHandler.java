@@ -32,7 +32,7 @@ public class CommonExceptionHandler {
         log.error(e.getMessage(), e);
         String errorMessage = e.getBindingResult().getAllErrors().stream()
                 .map(ObjectError::getDefaultMessage)
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining(";"));
         return RestResp.fail(errorMessage);
     }
 

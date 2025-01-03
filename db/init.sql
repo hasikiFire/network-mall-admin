@@ -30,7 +30,7 @@ CREATE TABLE `roles` (
 CREATE TABLE `package_item` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
   `package_name` varchar(100) NOT NULL COMMENT '套餐名称',
-  `package_desc` varchar(100) DEFAULT NULL COMMENT '套餐描述',
+  `package_desc` text DEFAULT NULL COMMENT '套餐描述',
   `original_price` decimal(10, 2) NOT NULL COMMENT '商品原价',
   `package_status` int NOT NULL DEFAULT '0' COMMENT '状态。 0: 未启用 1：活动，2：下架',
   `sale_price` decimal(10, 2) NOT NULL DEFAULT '0.00' COMMENT '商品销售价',
