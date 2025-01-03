@@ -14,8 +14,10 @@ import com.hasikiFire.networkmall.dto.req.PackageEditReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageListReqDto;
 import com.hasikiFire.networkmall.dto.resp.PackageListRespDto;
 import com.hasikiFire.networkmall.dto.resp.PackageRespDto;
+import com.hasikiFire.networkmall.dto.resp.UsageRecordDetailRespDto;
 import com.hasikiFire.networkmall.service.UsageRecordService;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -33,13 +35,17 @@ import lombok.RequiredArgsConstructor;
 public class UsageRecordController {
   private final UsageRecordService usageRecordService;
 
-  // 获取使用纪录列表
+  // 获取正在使用的套餐
+  @SaCheckLogin
   @GetMapping("/detail")
-  public RestResp<PageRespDto<PackageListRespDto>> recordDetail(@Valid @RequestParam PackageListReqDto params) {
-    return usageRecordService.recordDetail(params);
+  public RestResp<UsageRecord> recordDetail() {
+    return usageRecordService.recordDetail();
   }
 
   // 更新套餐使用纪录
+  /*
+   * 场景： 定时任务xx-job 设置过期用
+   */
   @PutMapping("/update")
   public RestResp<UsageRecord> updateRecord(@Valid @RequestBody PackageEditReqDto params) {
     return usageRecordService.updateRecord(params);

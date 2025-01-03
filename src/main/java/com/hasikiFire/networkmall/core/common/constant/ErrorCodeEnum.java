@@ -30,9 +30,109 @@ public enum ErrorCodeEnum {
     USER_LOGIN_EXPIRED(401, "用户登录已过期"),
 
     /**
+     * 用户未登录
+     */
+    USER_NOT_LOGIN(401, "用户未登录"),
+
+    /**
+     * 用户无权限
+     */
+    USER_NO_PERMISSION(403, "用户无权限"),
+
+    /**
+     * 用户无角色
+     */
+    USER_NO_ROLE(403, "用户无角色"),
+
+    /**
+     * 参数校验失败
+     */
+    PARAM_VALIDATE_FAILED(400, "参数校验失败"),
+
+    /**
+     * 资源未找到
+     */
+    RESOURCE_NOT_FOUND(404, "资源未找到"),
+
+    /**
+     * 请求方法不支持
+     */
+    METHOD_NOT_ALLOWED(405, "请求方法不支持"),
+
+    /**
+     * 请求过于频繁
+     */
+    TOO_MANY_REQUESTS(429, "请求过于频繁"),
+
+    /**
      * 一级宏观错误码，系统执行出错
      */
-    SYSTEM_ERROR(500, "系统执行出错");
+    SYSTEM_ERROR(500, "系统执行出错"),
+
+    /**
+     * 服务不可用
+     */
+    SERVICE_UNAVAILABLE(503, "服务不可用"),
+
+    /**
+     * 数据库操作失败
+     */
+    DATABASE_ERROR(500, "数据库操作失败"),
+
+    /**
+     * 网络请求失败
+     */
+    NETWORK_ERROR(500, "网络请求失败"),
+
+    /**
+     * 文件上传失败
+     */
+    FILE_UPLOAD_FAILED(500, "文件上传失败"),
+
+    /**
+     * 文件下载失败
+     */
+    FILE_DOWNLOAD_FAILED(500, "文件下载失败"),
+
+    /**
+     * 数据解析失败
+     */
+    DATA_PARSE_FAILED(500, "数据解析失败"),
+
+    /**
+     * 数据加密失败
+     */
+    DATA_ENCRYPT_FAILED(500, "数据加密失败"),
+
+    /**
+     * 数据解密失败
+     */
+    DATA_DECRYPT_FAILED(500, "数据解密失败"),
+
+    /**
+     * 重复操作
+     */
+    REPEAT_OPERATION(400, "重复操作"),
+
+    /**
+     * 操作不允许
+     */
+    OPERATION_NOT_ALLOWED(403, "操作不允许"),
+
+    /**
+     * 资源已存在
+     */
+    RESOURCE_ALREADY_EXISTS(409, "资源已存在"),
+
+    /**
+     * 请求超时
+     */
+    REQUEST_TIMEOUT(408, "请求超时"),
+
+    /**
+     * 未知错误
+     */
+    UNKNOWN_ERROR(500, "未知错误");
 
     /**
      * 错误码

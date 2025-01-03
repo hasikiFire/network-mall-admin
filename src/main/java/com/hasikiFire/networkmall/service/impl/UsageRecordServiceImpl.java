@@ -1,5 +1,6 @@
 package com.hasikiFire.networkmall.service.impl;
 
+import com.hasikiFire.networkmall.core.common.exception.BusinessException;
 import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.dao.entity.UsageRecord;
@@ -7,17 +8,19 @@ import com.hasikiFire.networkmall.dao.mapper.UsageRecordMapper;
 import com.hasikiFire.networkmall.dto.req.PackageEditReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageListReqDto;
 import com.hasikiFire.networkmall.dto.req.UsageRecordAddReqDto;
+import com.hasikiFire.networkmall.dto.req.UsageRecordEditReqDto;
 import com.hasikiFire.networkmall.dto.resp.PackageListRespDto;
 import com.hasikiFire.networkmall.dto.resp.PackageRespDto;
+import com.hasikiFire.networkmall.dto.resp.UsageRecordDetailRespDto;
 import com.hasikiFire.networkmall.service.UsageRecordService;
 
+import cn.dev33.satoken.stp.StpUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-
-import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 
@@ -36,15 +39,65 @@ public class UsageRecordServiceImpl extends ServiceImpl<UsageRecordMapper, Usage
   private final UsageRecordMapper usageRecordMapper;
 
   @Override
-  public RestResp<PageRespDto<PackageListRespDto>> recordDetail(@Valid PackageListReqDto params) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'recordDetail'");
+  public RestResp<UsageRecord> recordDetail() {
+    String userId = StpUtil.getLoginIdAsString();
+
+    // Query the latest record for the user
+    UsageRecord record = usageRecordMapper.selectOne(
+        new LambdaQueryWrapper<UsageRecord>()
+            .eq(UsageRecord::getUserId, userId)
+            .last("LIMIT 1"));
+
+    if (record == null) {
+      return RestResp.ok(null);
+    }
+
+    return RestResp.ok(record);
   }
 
   @Override
-  public RestResp<UsageRecord> updateRecord(@Valid PackageEditReqDto params) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'updateRecord'");
+  public RestResp<UsageRecord> updateRecord(@Valid UsageRecordEditReqDto params) {
+
+    UsageRecord record = usageRecordMapper.selectById(params.getId());
+    if (record == null) {
+      throw new BusinessException("记录不存在");
+    }
+
+    try {
+      // Update fields
+      if (params.getOrderCode() != null) {
+        record.setOrderCode(params.getOrderCode());
+      }
+      if (params.getUserId() != null) {
+        record.setUserId(params.getUserId());
+      }
+      if (params.getPurchaseStatus() != null) {
+        record.setPurchaseStatus(params.getPurchaseStatus());
+      }
+      if (params.getPurchaseStartTime() != null) {
+        record.setPurchaseStartTime(params.getPurchaseStartTime());
+      }
+      if (params.getPurchaseEndTime() != null) {
+        record.setPurchaseEndTime(params.getPurchaseEndTime());
+      }
+      if (params.getDeviceNum() != null) {
+        record.setDeviceNum(params.getDeviceNum());
+      }
+      if (params.getDataAllowance() != null) {
+        record.setDataAllowance(params.getDataAllowance());
+      }
+      if (params.getConsumedDataTransfer() != null) {
+        record.setConsumedDataTransfer(params.getConsumedDataTransfer());
+      }
+      if (params.getSpeedLimit() != null) {
+        record.setSpeedLimit(params.getSpeedLimit());
+      }
+      usageRecordMapper.updateById(record);
+      return RestResp.ok(record);
+    } catch (Exception e) {
+      log.error("更新记录失败", e);
+      throw new BusinessException("更新记录失败");
+    }
   }
 
   @Override
@@ -57,11 +110,10 @@ public class UsageRecordServiceImpl extends ServiceImpl<UsageRecordMapper, Usage
     usageRecord.setPurchaseStatus(1);
     usageRecord.setPurchaseStartTime(params.getPurchaseStartTime());
     usageRecord.setPurchaseEndTime(params.getPurchaseEndTime());
-    // TODO speedLimit
     usageRecord.setConsumedDataTransfer(0L);
     usageRecord.setDeviceNum(params.getDeviceNum());
     usageRecord.setDataAllowance(params.getDataAllowance());
-    // usageRecord.setDeviceNum(params.getDeviceNum());
+    usageRecord.setSpeedLimit(params.getSpeedLimit());
 
     try {
       usageRecordMapper.insert(usageRecord);
