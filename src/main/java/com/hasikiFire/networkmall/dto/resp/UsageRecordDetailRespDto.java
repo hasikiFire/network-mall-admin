@@ -68,11 +68,6 @@ public class UsageRecordDetailRespDto {
   private Integer deviceNum;
 
   /**
-   * 订阅链接
-   */
-  private String subscriptionLink;
-
-  /**
    * 创建时间
    */
   private LocalDateTime createdAt;
