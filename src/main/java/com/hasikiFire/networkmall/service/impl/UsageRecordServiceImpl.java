@@ -46,6 +46,7 @@ public class UsageRecordServiceImpl extends ServiceImpl<UsageRecordMapper, Usage
     UsageRecord record = usageRecordMapper.selectOne(
         new LambdaQueryWrapper<UsageRecord>()
             .eq(UsageRecord::getUserId, userId)
+            .eq(UsageRecord::getPurchaseStatus, 1)
             .last("LIMIT 1"));
 
     if (record == null) {
