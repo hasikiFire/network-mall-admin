@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -13,7 +12,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author ${author}
- * @since 2024/12/23
+ * @since 2025/01/06
  */
 @TableName("usage_record")
 public class UsageRecord implements Serializable {
@@ -42,7 +41,7 @@ public class UsageRecord implements Serializable {
     private Long userId;
 
     /**
-     * 套餐状态 0:未开始 1：生效中 2：流量已用尽 3：已过期
+     * 套餐状态 0:未开始 1：生效中 2：流量已用尽 3：已过期 
      */
     private Integer purchaseStatus;
 
@@ -77,6 +76,11 @@ public class UsageRecord implements Serializable {
     private Integer deviceNum;
 
     /**
+     * 在线设备数量限额
+     */
+    private Integer deviceLimit;
+
+    /**
      * 创建时间
      */
     private LocalDateTime createdAt;
@@ -90,6 +94,7 @@ public class UsageRecord implements Serializable {
      * 是否已删除 1：已删除 0：未删除
      */
     private Integer deleted;
+
 
     public Long getId() {
         return id;
@@ -179,6 +184,14 @@ public class UsageRecord implements Serializable {
         this.deviceNum = deviceNum;
     }
 
+    public Integer getDeviceLimit() {
+        return deviceLimit;
+    }
+
+    public void setDeviceLimit(Integer deviceLimit) {
+        this.deviceLimit = deviceLimit;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -206,20 +219,21 @@ public class UsageRecord implements Serializable {
     @Override
     public String toString() {
         return "UsageRecord{" +
-                "id=" + id +
-                ", packageId=" + packageId +
-                ", orderCode=" + orderCode +
-                ", userId=" + userId +
-                ", purchaseStatus=" + purchaseStatus +
-                ", purchaseStartTime=" + purchaseStartTime +
-                ", purchaseEndTime=" + purchaseEndTime +
-                ", dataAllowance=" + dataAllowance +
-                ", consumedDataTransfer=" + consumedDataTransfer +
-                ", speedLimit=" + speedLimit +
-                ", deviceNum=" + deviceNum +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", deleted=" + deleted +
-                "}";
+        "id=" + id +
+        ", packageId=" + packageId +
+        ", orderCode=" + orderCode +
+        ", userId=" + userId +
+        ", purchaseStatus=" + purchaseStatus +
+        ", purchaseStartTime=" + purchaseStartTime +
+        ", purchaseEndTime=" + purchaseEndTime +
+        ", dataAllowance=" + dataAllowance +
+        ", consumedDataTransfer=" + consumedDataTransfer +
+        ", speedLimit=" + speedLimit +
+        ", deviceNum=" + deviceNum +
+        ", deviceLimit=" + deviceLimit +
+        ", createdAt=" + createdAt +
+        ", updatedAt=" + updatedAt +
+        ", deleted=" + deleted +
+        "}";
     }
 }
