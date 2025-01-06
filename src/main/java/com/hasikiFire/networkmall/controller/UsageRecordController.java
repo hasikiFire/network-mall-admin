@@ -4,17 +4,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.dao.entity.UsageRecord;
-import com.hasikiFire.networkmall.dto.req.PackageEditReqDto;
-import com.hasikiFire.networkmall.dto.req.PackageListReqDto;
-import com.hasikiFire.networkmall.dto.resp.PackageListRespDto;
-import com.hasikiFire.networkmall.dto.resp.PackageRespDto;
-import com.hasikiFire.networkmall.dto.resp.UsageRecordDetailRespDto;
+import com.hasikiFire.networkmall.dto.req.UsageRecordEditReqDto;
 import com.hasikiFire.networkmall.service.UsageRecordService;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
@@ -47,7 +41,7 @@ public class UsageRecordController {
    * 场景： 定时任务xx-job 设置过期用
    */
   @PutMapping("/update")
-  public RestResp<UsageRecord> updateRecord(@Valid @RequestBody PackageEditReqDto params) {
+  public RestResp<UsageRecord> updateRecord(@Valid @RequestBody UsageRecordEditReqDto params) {
     return usageRecordService.updateRecord(params);
   }
 }
