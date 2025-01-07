@@ -9,8 +9,8 @@ import java.io.Serializable;
  * 配置表
  * </p>
  *
- * @author ${hasikiFire}
- * @since 2024/12/09
+ * @author ${author}
+ * @since 2025/01/07
  */
 public class Config implements Serializable {
 
@@ -43,9 +43,15 @@ public class Config implements Serializable {
     private String type;
 
     /**
+     * 默认值
+     */
+    private String default;
+
+    /**
      * 备注
      */
     private String mark;
+
 
     public Long getId() {
         return id;
@@ -87,6 +93,14 @@ public class Config implements Serializable {
         this.type = type;
     }
 
+    public String getDefault() {
+        return default;
+    }
+
+    public void setDefault(String default) {
+        this.default = default;
+    }
+
     public String getMark() {
         return mark;
     }
@@ -98,12 +112,13 @@ public class Config implements Serializable {
     @Override
     public String toString() {
         return "Config{" +
-                "id=" + id +
-                ", item=" + item +
-                ", value=" + value +
-                ", isPublic=" + isPublic +
-                ", type=" + type +
-                ", mark=" + mark +
-                "}";
+        "id=" + id +
+        ", item=" + item +
+        ", value=" + value +
+        ", isPublic=" + isPublic +
+        ", type=" + type +
+        ", default=" + default +
+        ", mark=" + mark +
+        "}";
     }
 }
