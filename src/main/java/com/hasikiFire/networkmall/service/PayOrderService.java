@@ -1,9 +1,11 @@
 package com.hasikiFire.networkmall.service;
 
+import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.dao.entity.PackageItem;
 import com.hasikiFire.networkmall.dao.entity.PayOrder;
 import com.hasikiFire.networkmall.dto.req.PackageBuyReqDto;
 import com.baomidou.mybatisplus.extension.service.IService;
+import java.util.List;
 
 /**
  * <p>
@@ -47,4 +49,11 @@ public interface PayOrderService extends IService<PayOrder> {
    * @return 订单状态
    */
   Integer getOrderStatus(Long orderId);
+
+  /**
+   * 获取用户订单列表
+   * 
+   * @return 订单列表
+   */
+  RestResp<List<PayOrder>> getOrderList();
 }

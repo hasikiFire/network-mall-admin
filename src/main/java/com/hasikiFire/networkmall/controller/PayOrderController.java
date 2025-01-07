@@ -1,9 +1,13 @@
 package com.hasikiFire.networkmall.controller;
 
-
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import java.util.List;
+import com.hasikiFire.networkmall.service.PayOrderService;
+import com.hasikiFire.networkmall.core.common.resp.RestResp;
+import com.hasikiFire.networkmall.dao.entity.PayOrder;
 
 /**
  * <p>
@@ -15,7 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/payOrder")
+@RequiredArgsConstructor
 public class PayOrderController {
 
-}
+  private final PayOrderService payOrderService;
 
+  @GetMapping("/list")
+  public RestResp<List<PayOrder>> getOrderList() {
+    return payOrderService.getOrderList();
+  }
+}

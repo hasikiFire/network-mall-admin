@@ -162,17 +162,18 @@ CREATE TABLE `foreign_server` (
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
--- 钱包、返利--start
-CREATE TABLE wallets (
-  id bigint AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
-  user_id bigint NOT NULL COMMENT '用户ID',
-  balance decimal(10, 2) NOT NULL COMMENT '余额',
-  currency tinyint NOT NULL DEFAULT '1' COMMENT '货币类型（1：人民币 2: USDT） ',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (id)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '钱包表';
+-- 钱包、返利--start 
+CREATE TABLE `wallet` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `balance` decimal(10, 2) NOT NULL COMMENT '余额',
+  `currency` tinyint NOT NULL DEFAULT '1' COMMENT '货币类型（1：人民币 2: USDT） ',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '钱包表';
 
+-- 钱包、返利--end
 CREATE TABLE promotion_links (
   id bigint AUTO_INCREMENT COMMENT '主键ID',
   promotion_code VARCHAR(255) NOT NULL COMMENT '链接代码',
@@ -185,17 +186,6 @@ CREATE TABLE promotion_links (
   PRIMARY KEY (id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '推广链接表';
 
-CREATE TABLE `wallet` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `user_id` bigint NOT NULL COMMENT '用户ID',
-  `balance` decimal(10, 2) NOT NULL COMMENT '余额',
-  `currency` tinyint NOT NULL DEFAULT '1' COMMENT '货币类型（1：人民币 2: USDT） ',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '钱包表';
-
--- 钱包、返利--end
 CREATE TABLE audit_rule (
   id bigint UNSIGNED AUTO_INCREMENT,
   name VARCHAR(255) NOT NULL COMMENT '名称',
@@ -238,3 +228,16 @@ CREATE TABLE `link` (
   UNIQUE KEY `token` (`token`),
   UNIQUE KEY `user_id` (`user_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '订阅链接表';
+
+CREATE TABLE `user_coupon` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '优惠码ID',
+  `code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '优惠码',
+  `content` json NOT NULL COMMENT '优惠码内容',
+  `limit` json NOT NULL COMMENT '优惠码限制',
+  `use_count` int unsigned NOT NULL DEFAULT '0' COMMENT '累计使用次数',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `expire_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '过期时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `code` (`code`),
+  KEY `expire_time` (`expire_time`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;

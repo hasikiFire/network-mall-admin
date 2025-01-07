@@ -1,9 +1,15 @@
 package com.hasikiFire.networkmall.controller;
 
-
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import org.springframework.web.bind.annotation.RestController;
+
+import com.hasikiFire.networkmall.core.common.resp.RestResp;
+import com.hasikiFire.networkmall.dao.entity.PayOrderItem;
+import com.hasikiFire.networkmall.service.PayOrderItemService;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * <p>
@@ -15,7 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/payOrderItem")
+@RequiredArgsConstructor
 public class PayOrderItemController {
 
-}
+  private final PayOrderItemService payOrderItemService;
 
+  @GetMapping("/detail")
+  public RestResp<PayOrderItem> getOrderItemDetail(@RequestParam String orderCode) {
+    return payOrderItemService.getOrderItemByOrderCode(orderCode);
+  }
+}

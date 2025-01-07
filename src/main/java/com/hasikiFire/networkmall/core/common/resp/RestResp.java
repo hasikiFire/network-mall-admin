@@ -72,12 +72,12 @@ public class RestResp<T> {
         return new RestResp<>(errorCode);
     }
 
-    public static RestResp<Void> fail(String errorMessage) {
-        return new RestResp<>(ErrorCodeEnum.SYSTEM_ERROR, errorMessage);
-    }
-
     public static RestResp<Void> sucess() {
         return new RestResp<>(ErrorCodeEnum.OK);
+    }
+
+    public static <T> RestResp<T> fail(String message) {
+        return new RestResp<T>(ErrorCodeEnum.SYSTEM_ERROR, message);
     }
 
     /**
@@ -85,6 +85,10 @@ public class RestResp<T> {
      */
     public static RestResp<Void> error() {
         return new RestResp<>(ErrorCodeEnum.SYSTEM_ERROR);
+    }
+
+    public static <T> RestResp<T> error(String message) {
+        return new RestResp<T>(ErrorCodeEnum.SYSTEM_ERROR, message);
     }
 
 }

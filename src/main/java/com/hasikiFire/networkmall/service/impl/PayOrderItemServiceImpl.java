@@ -1,5 +1,7 @@
 package com.hasikiFire.networkmall.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.dao.entity.PackageItem;
 import com.hasikiFire.networkmall.dao.entity.PayOrder;
 import com.hasikiFire.networkmall.dao.entity.PayOrderItem;
@@ -49,5 +51,18 @@ public class PayOrderItemServiceImpl extends ServiceImpl<PayOrderItemMapper, Pay
       throw new RuntimeException("订单明细插入失败", e);
     }
     return payOrderItem;
+  }
+
+  @Override
+  public RestResp<PayOrderItem> getOrderItemByOrderCode(String orderCode) {
+    LambdaQueryWrapper<PayOrderItem> queryWrapper = new LambdaQueryWrapper<>();
+    queryWrapper.eq(PayOrderItem::getOrderCode, orderCode);
+
+    PayOrderItem orderItem = this.getOne(queryWrapper);
+    if (orderItem == null) {
+      return RestResp.fail("订单项不存在");
+    }
+
+    return RestResp.ok(orderItem);
   }
 }
