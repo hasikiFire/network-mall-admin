@@ -25,7 +25,7 @@ public class Config implements Serializable {
     /**
      * 配置项
      */
-    private String item;
+    private String code;
 
     /**
      * 配置值
@@ -43,15 +43,9 @@ public class Config implements Serializable {
     private String type;
 
     /**
-     * 默认值
-     */
-    private String default;
-
-    /**
      * 备注
      */
     private String mark;
-
 
     public Long getId() {
         return id;
@@ -61,12 +55,12 @@ public class Config implements Serializable {
         this.id = id;
     }
 
-    public String getItem() {
-        return item;
+    public String getCode() {
+        return code;
     }
 
-    public void setItem(String item) {
-        this.item = item;
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getValue() {
@@ -93,14 +87,6 @@ public class Config implements Serializable {
         this.type = type;
     }
 
-    public String getDefault() {
-        return default;
-    }
-
-    public void setDefault(String default) {
-        this.default = default;
-    }
-
     public String getMark() {
         return mark;
     }
@@ -112,13 +98,12 @@ public class Config implements Serializable {
     @Override
     public String toString() {
         return "Config{" +
-        "id=" + id +
-        ", item=" + item +
-        ", value=" + value +
-        ", isPublic=" + isPublic +
-        ", type=" + type +
-        ", default=" + default +
-        ", mark=" + mark +
-        "}";
+                "id=" + id +
+                ", code=" + code +
+                ", value=" + value +
+                ", isPublic=" + isPublic +
+                ", type=" + type +
+                ", mark=" + mark +
+                "}";
     }
 }

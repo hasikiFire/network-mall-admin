@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
  * 订单表
  * </p>
  *
- * @author ${hasikiFire}
- * @since 2024/07/04
+ * @author ${author}
+ * @since 2025/01/08
  */
 @TableName("pay_order")
 public class PayOrder implements Serializable {
@@ -62,19 +62,24 @@ public class PayOrder implements Serializable {
     private LocalDateTime orderExpireTime;
 
     /**
-     * 订单状态， wait_pay(待支付)、	  paid(已支付)refunding退款中)、refunded(已退款)、closed(订单关闭)
+     * 订单状态， wait_pay(待支付)、 paid(已支付)refunding退款中)、refunded(已退款)、closed(订单关闭)
      */
     private String orderStatus;
 
     /**
-     * 订单备注
+     * 订单金额
      */
-    private String orderRemark;
+    private BigDecimal orderAmount;
 
     /**
      * 支付金额
      */
     private BigDecimal payAmount;
+
+    /**
+     * 订单备注
+     */
+    private String orderRemark;
 
     /**
      * 支付时间
@@ -97,14 +102,14 @@ public class PayOrder implements Serializable {
     private String payStatus;
 
     /**
-     * 平台优惠券ID
+     * 优惠券编码
      */
-    private String platformCouponId;
+    private String couponCode;
 
     /**
-     * 平台优惠券优惠金额
+     * 已优惠金额
      */
-    private BigDecimal platformCouponAmount;
+    private BigDecimal couponAmount;
 
     /**
      * 收款商户ID
@@ -150,7 +155,6 @@ public class PayOrder implements Serializable {
      * 更新时间
      */
     private LocalDateTime updatedAt;
-
 
     public Long getId() {
         return id;
@@ -224,12 +228,12 @@ public class PayOrder implements Serializable {
         this.orderStatus = orderStatus;
     }
 
-    public String getOrderRemark() {
-        return orderRemark;
+    public BigDecimal getOrderAmount() {
+        return orderAmount;
     }
 
-    public void setOrderRemark(String orderRemark) {
-        this.orderRemark = orderRemark;
+    public void setOrderAmount(BigDecimal orderAmount) {
+        this.orderAmount = orderAmount;
     }
 
     public BigDecimal getPayAmount() {
@@ -238,6 +242,14 @@ public class PayOrder implements Serializable {
 
     public void setPayAmount(BigDecimal payAmount) {
         this.payAmount = payAmount;
+    }
+
+    public String getOrderRemark() {
+        return orderRemark;
+    }
+
+    public void setOrderRemark(String orderRemark) {
+        this.orderRemark = orderRemark;
     }
 
     public LocalDateTime getPayTime() {
@@ -272,20 +284,20 @@ public class PayOrder implements Serializable {
         this.payStatus = payStatus;
     }
 
-    public String getPlatformCouponId() {
-        return platformCouponId;
+    public String getCouponCode() {
+        return couponCode;
     }
 
-    public void setPlatformCouponId(String platformCouponId) {
-        this.platformCouponId = platformCouponId;
+    public void setCouponCode(String couponCode) {
+        this.couponCode = couponCode;
     }
 
-    public BigDecimal getPlatformCouponAmount() {
-        return platformCouponAmount;
+    public BigDecimal getCouponAmount() {
+        return couponAmount;
     }
 
-    public void setPlatformCouponAmount(BigDecimal platformCouponAmount) {
-        this.platformCouponAmount = platformCouponAmount;
+    public void setCouponAmount(BigDecimal couponAmount) {
+        this.couponAmount = couponAmount;
     }
 
     public String getSupplierId() {
@@ -363,32 +375,33 @@ public class PayOrder implements Serializable {
     @Override
     public String toString() {
         return "PayOrder{" +
-        "id=" + id +
-        ", orderCode=" + orderCode +
-        ", tradeNo=" + tradeNo +
-        ", userId=" + userId +
-        ", packageId=" + packageId +
-        ", packageUnit=" + packageUnit +
-        ", orderCreateTime=" + orderCreateTime +
-        ", orderExpireTime=" + orderExpireTime +
-        ", orderStatus=" + orderStatus +
-        ", orderRemark=" + orderRemark +
-        ", payAmount=" + payAmount +
-        ", payTime=" + payTime +
-        ", payWay=" + payWay +
-        ", paySeene=" + paySeene +
-        ", payStatus=" + payStatus +
-        ", platformCouponId=" + platformCouponId +
-        ", platformCouponAmount=" + platformCouponAmount +
-        ", supplierId=" + supplierId +
-        ", refundNo=" + refundNo +
-        ", refundReqTime=" + refundReqTime +
-        ", refundTime=" + refundTime +
-        ", refundAmount=" + refundAmount +
-        ", refundStatus=" + refundStatus +
-        ", deleted=" + deleted +
-        ", createdAt=" + createdAt +
-        ", updatedAt=" + updatedAt +
-        "}";
+                "id=" + id +
+                ", orderCode=" + orderCode +
+                ", tradeNo=" + tradeNo +
+                ", userId=" + userId +
+                ", packageId=" + packageId +
+                ", packageUnit=" + packageUnit +
+                ", orderCreateTime=" + orderCreateTime +
+                ", orderExpireTime=" + orderExpireTime +
+                ", orderStatus=" + orderStatus +
+                ", orderAmount=" + orderAmount +
+                ", payAmount=" + payAmount +
+                ", orderRemark=" + orderRemark +
+                ", payTime=" + payTime +
+                ", payWay=" + payWay +
+                ", paySeene=" + paySeene +
+                ", payStatus=" + payStatus +
+                ", couponCode=" + couponCode +
+                ", couponAmount=" + couponAmount +
+                ", supplierId=" + supplierId +
+                ", refundNo=" + refundNo +
+                ", refundReqTime=" + refundReqTime +
+                ", refundTime=" + refundTime +
+                ", refundAmount=" + refundAmount +
+                ", refundStatus=" + refundStatus +
+                ", deleted=" + deleted +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                "}";
     }
 }

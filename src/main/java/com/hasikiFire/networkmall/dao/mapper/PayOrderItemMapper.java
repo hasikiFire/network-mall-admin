@@ -8,8 +8,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * 订单项表 Mapper 接口
  * </p>
  *
- * @author ${hasikiFire}
- * @since 2024/07/04
+ * @author ${author}
+ * @since 2025/01/08
  */
 public interface PayOrderItemMapper extends BaseMapper<PayOrderItem> {
 

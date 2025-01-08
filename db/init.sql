@@ -39,7 +39,7 @@ CREATE TABLE `package_item` (
   `discount_end_date` timestamp NULL DEFAULT NULL COMMENT '折扣结束日期',
   `data_allowance` bigint NOT NULL COMMENT '数据流量限额（单位：B）',
   `device_limit` int DEFAULT NULL COMMENT '设备数量限制',
-  `speed_limit` smallint DEFAULT NULL COMMENT '速率限制（单位：MB）',
+  `speed_limit` bigint unsigned DEFAULT NULL COMMENT '流量速率限额（单位：B）',
   `deleted` tinyint DEFAULT '0' COMMENT '是否已删除 1：已删除 0：未删除',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -49,8 +49,8 @@ CREATE TABLE `package_item` (
 -- 订单相关-start
 CREATE TABLE pay_order (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
-  order_code varchar(50) NOT NULL COMMENT '订单号',
-  trade_no varchar(50) COMMENT '外部支付系统交易号',
+  order_code varchar(255) NOT NULL COMMENT '订单号',
+  trade_no varchar(255) COMMENT '外部支付系统交易号',
   -- 外键
   user_id bigint NOT NULL COMMENT '用户ID',
   -- 外键
@@ -61,14 +61,15 @@ CREATE TABLE pay_order (
   order_status varchar(16) NOT NULL DEFAULT 'wait_pay' COMMENT '订单状态， wait_pay(待支付)、
   paid(已支付)refunding退款中)、refunded(已退款)、closed(订单关闭)',
   order_remark varchar(128) COMMENT '订单备注',
-  pay_amount decimal(10, 2) NOT NULL DEFAULT '0.00' COMMENT '支付金额',
   -- 支付
+  order_amount decimal(10, 2) NOT NULL DEFAULT '0.00' COMMENT '订单金额',
+  pay_amount decimal(10, 2) NOT NULL DEFAULT '0.00' COMMENT '支付金额',
   pay_time timestamp COMMENT '支付时间',
   pay_way varchar(32) COMMENT '支付方式: wxpay(微信支付)、alipay支付宝支付),USTD(加密货币交易)',
   pay_seene varchar(32) COMMENT 'ONLINE_PAY(在线支付)、QRCODE_SCAN_PAY（扫码支), QRCODE_SHOW_PAY(付款码支付)',
   pay_status varchar(16) DEFAULT 'waiting' COMMENT '支付状态， waiting(待支付)、success(支付成功)，failed(支付失败)',
-  `platform_coupon_id` varchar(32) DEFAULT NULL COMMENT '平台优惠券ID',
-  `platform_coupon_amount` decimal(10, 2) DEFAULT NULL COMMENT '平台优惠券优惠金额',
+  `coupon_code` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '优惠券编码',
+  `coupon_amount` decimal(10, 2) DEFAULT NULL COMMENT '已优惠金额',
   `supplier_id` varchar(32) COMMENT '收款商户ID',
   -- 退款 
   `refund_no` timestamp NULL DEFAULT NULL COMMENT '退款单号',
@@ -96,26 +97,27 @@ CREATE TABLE `pay_order_refund` (
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '订单退款表';
 
-CREATE TABLE pay_order_item (
+CREATE TABLE `pay_order_item` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
-  order_code varchar(50) NOT NULL COMMENT '订单号',
-  package_id bigint NOT NULL COMMENT '套餐主键',
-  package_name VARCHAR(100) NOT NULL COMMENT '套餐名称',
-  package_desc VARCHAR(100) COMMENT '套餐描述',
-  package_unit INT NOT NULL DEFAULT '0' COMMENT '计费周期。单位：月份',
-  original_price decimal(10, 2) NOT NULL COMMENT '商品原价',
-  sale_price decimal(10, 2) NOT NULL DEFAULT '0.00' COMMENT '商品销售价',
-  discount DECIMAL(5, 2) COMMENT '折扣百分比',
-  discount_start_date TIMESTAMP COMMENT '折扣开始日期',
-  discount_end_date TIMESTAMP COMMENT '折扣结束日期',
-  `data_allowance` int NOT NULL COMMENT '数据流量限额（单位：GB）',
-  device_limit int COMMENT '在线设备数量限额',
-  speed_limit decimal(10, 2) COMMENT '速率限制（单位：Mbps）',
-  `deleted` tinyint(2) DEFAULT '0' COMMENT '是否已删除 1：已删除 0：未删除',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (id)
-) COMMENT '订单项表';
+  `order_code` varchar(50) NOT NULL COMMENT '订单号',
+  `package_id` bigint NOT NULL COMMENT '套餐主键',
+  `package_unit` INT NOT NULL DEFAULT '0' COMMENT '计费周期。单位：月份',
+  `package_name` varchar(100) NOT NULL COMMENT '套餐名称',
+  `package_desc` text COMMENT '套餐描述',
+  `original_price` decimal(10, 2) NOT NULL COMMENT '商品原价',
+  `package_status` int NOT NULL DEFAULT '0' COMMENT '状态。 0: 未启用 1：活动，2：下架',
+  `sale_price` decimal(10, 2) NOT NULL DEFAULT '0.00' COMMENT '商品销售价',
+  `discount` decimal(5, 2) DEFAULT NULL COMMENT '折扣百分比',
+  `discount_start_date` timestamp NULL DEFAULT NULL COMMENT '折扣开始日期',
+  `discount_end_date` timestamp NULL DEFAULT NULL COMMENT '折扣结束日期',
+  `data_allowance` bigint NOT NULL COMMENT '数据流量限额（单位：B）',
+  `device_limit` int DEFAULT NULL COMMENT '设备数量限制',
+  `speed_limit` bigint unsigned DEFAULT NULL COMMENT '流量速率限额（单位：B）',
+  `deleted` tinyint DEFAULT '0' COMMENT '是否已删除 1：已删除 0：未删除',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '订单项表';
 
 CREATE TABLE `usage_record` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -209,7 +211,7 @@ CREATE TABLE audit_log (
 
 CREATE TABLE `config` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '配置ID',
-  `item` varchar(255) NOT NULL DEFAULT '' COMMENT '配置项',
+  `code` varchar(255) NOT NULL DEFAULT '' COMMENT '配置项',
   `value` varchar(2048) NOT NULL DEFAULT '' COMMENT '配置值',
   `is_public` tinyint(1) unsigned NOT NULL DEFAULT 0 COMMENT '是否为公共参数',
   `type` varchar(16) NOT NULL DEFAULT '' COMMENT '配置值类型',

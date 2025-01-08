@@ -44,6 +44,7 @@ public class PayOrderItemServiceImpl extends ServiceImpl<PayOrderItemMapper, Pay
     payOrderItem.setDataAllowance(packageItem.getDataAllowance());
     payOrderItem.setDeviceLimit(packageItem.getDeviceLimit());
     payOrderItem.setSpeedLimit(packageItem.getSpeedLimit());
+
     try {
       payOrderItemMapper.insert(payOrderItem);
 

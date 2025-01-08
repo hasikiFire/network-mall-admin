@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import java.util.List;
 import com.hasikiFire.networkmall.service.PayOrderService;
+
+import cn.dev33.satoken.annotation.SaCheckLogin;
+
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.dao.entity.PayOrder;
 
@@ -24,6 +27,7 @@ public class PayOrderController {
 
   private final PayOrderService payOrderService;
 
+  @SaCheckLogin
   @GetMapping("/list")
   public RestResp<List<PayOrder>> getOrderList() {
     return payOrderService.getOrderList();

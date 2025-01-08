@@ -19,4 +19,9 @@ public interface ConfigService extends IService<Config> {
    * 获取所有配置项
    */
   RestResp<List<Config>> getAllConfigs();
+
+  /**
+   * 获取单个配置值
+   */
+  String getConfigValue(String configKey);
 }

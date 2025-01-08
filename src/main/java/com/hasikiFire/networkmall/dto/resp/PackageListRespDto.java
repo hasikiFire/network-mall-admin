@@ -45,8 +45,8 @@ public class PackageListRespDto {
   @Schema(description = "设备数量限制。无值表示无限制")
   private Integer deviceLimit;
 
-  @Schema(description = "速率限制（单位：Mbps）。无值表示无限制")
-  private Integer speedLimit;
+  @Schema(description = "速率限制（单位：MB/s）。无值表示无限制")
+  private Long speedLimit;
 
   @Schema(description = "是否已删除 1：已删除 0：未删除")
   private Integer deleted;

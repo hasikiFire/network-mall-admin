@@ -33,4 +33,13 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
     List<Config> configs = this.list(queryWrapper);
     return RestResp.ok(configs);
   }
+
+  @Override
+  public String getConfigValue(String configKey) {
+    Config config = this.getOne(
+        new LambdaQueryWrapper<Config>()
+            .eq(Config::getCode, configKey)
+            .last("LIMIT 1"));
+    return config != null ? config.getValue() : null;
+  }
 }

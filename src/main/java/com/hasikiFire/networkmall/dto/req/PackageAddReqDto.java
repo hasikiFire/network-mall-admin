@@ -51,7 +51,7 @@ public class PackageAddReqDto {
   @Schema(description = "设备限制数量，不传则不限制")
   private Integer deviceLimit;
 
-  @Schema(description = "速度限制，单位MB，不传则不限制", required = true)
-  private Integer speedLimit;
+  @Schema(description = "速度限制，单位B，不传则不限制", required = true)
+  private Long speedLimit;
 
 }

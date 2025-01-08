@@ -130,7 +130,7 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
       // 异常处理
       throw new BusinessException("添加套餐失败：" + e.getMessage());
     }
-    return RestResp.ok(PackageRespDto.builder().item(packageItem).build());
+    return RestResp.ok(PackageRespDto.builder().packageItem(packageItem).build());
   }
 
   @Override
@@ -178,23 +178,33 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
     if (user == null) {
       throw new BusinessException("用户不存在");
     }
+    try {
 
-    PayOrder payOrder = payOrderService.createOrder(packageItem, reqDto);
-    // 订单快照信息
-    payOrderItemService.createOrderItem(packageItem, payOrder);
+      PayOrder payOrder = payOrderService.createOrder(packageItem, reqDto);
+      // 订单快照信息
+      payOrderItemService.createOrderItem(packageItem, payOrder);
 
-    // TODO: 调用支付服务后做
-    payOrderService.payOrder(payOrder.getOrderCode());
-    // 假设订单支付成功
-    // 生成使用记录
-    UsageRecordAddReqDto usageRecordAddReqDto = new UsageRecordAddReqDto();
-    usageRecordAddReqDto.setOrderCode(payOrder.getOrderCode());
-    usageRecordAddReqDto.setUserId(reqDto.getUserId());
-    usageRecordAddReqDto.setPackageId(reqDto.getPackageId());
-    usageRecordAddReqDto.setPurchaseStartTime(LocalDateTime.now());
-    usageRecordAddReqDto.setPurchaseEndTime(LocalDateTime.now().plusMonths(reqDto.getMonth()));
-    usageRecordService.createRecord(usageRecordAddReqDto);
-    return RestResp.ok(PackageRespDto.builder().item(packageItem).build());
+      // TODO: 调用支付服务获取支付链接
+      payOrderService.payOrder(payOrder.getOrderCode());
+      //
+      // TODO 假设订单支付成功生成使用记录
+      UsageRecordAddReqDto usageRecordAddReqDto = new UsageRecordAddReqDto();
+      usageRecordAddReqDto.setOrderCode(payOrder.getOrderCode());
+      usageRecordAddReqDto.setUserId(reqDto.getUserId());
+      usageRecordAddReqDto.setPackageId(reqDto.getPackageId());
+      usageRecordAddReqDto.setPurchaseStartTime(LocalDateTime.now());
+      usageRecordAddReqDto.setPurchaseEndTime(LocalDateTime.now().plusMonths(reqDto.getMonth()));
+      usageRecordAddReqDto.setDeviceLimit(reqDto.getDeviceLimit());
+      usageRecordAddReqDto.setDataAllowance(reqDto.getDataAllowance());
+      usageRecordAddReqDto.setSpeedLimit(packageItem.getSpeedLimit());
+
+      usageRecordService.createRecord(usageRecordAddReqDto);
+      // TODO 应该订单支付链接，支付完成才生成使用记录
+      return RestResp.ok(PackageRespDto.builder().payOrder(payOrder).build());
+    } catch (Exception e) {
+      // 异常处理
+      throw new BusinessException("购买套餐失败：" + e.getMessage());
+    }
   }
 
   @Override

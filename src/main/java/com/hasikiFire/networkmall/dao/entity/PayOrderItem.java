@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
  * 订单项表
  * </p>
  *
- * @author ${hasikiFire}
- * @since 2024/07/04
+ * @author ${author}
+ * @since 2025/01/08
  */
 @TableName("pay_order_item")
 public class PayOrderItem implements Serializable {
@@ -37,6 +37,11 @@ public class PayOrderItem implements Serializable {
     private Long packageId;
 
     /**
+     * 计费周期。单位：月份
+     */
+    private Integer packageUnit;
+
+    /**
      * 套餐名称
      */
     private String packageName;
@@ -45,11 +50,6 @@ public class PayOrderItem implements Serializable {
      * 套餐描述
      */
     private String packageDesc;
-
-    /**
-     * 计费周期。单位：月份
-     */
-    private Integer packageUnit;
 
     /**
      * 商品原价
@@ -77,7 +77,7 @@ public class PayOrderItem implements Serializable {
     private LocalDateTime discountEndDate;
 
     /**
-     * 数据流量限额（单位：GB）
+     * 数据流量限额（单位：B）
      */
     private Long dataAllowance;
 
@@ -87,9 +87,9 @@ public class PayOrderItem implements Serializable {
     private Integer deviceLimit;
 
     /**
-     * 速率限制（单位：Mbps）
+     * 流量速率限额（单位：B）
      */
-    private Integer speedLimit;
+    private Long speedLimit;
 
     /**
      * 是否已删除 1：已删除 0：未删除
@@ -131,6 +131,14 @@ public class PayOrderItem implements Serializable {
         this.packageId = packageId;
     }
 
+    public Integer getPackageUnit() {
+        return packageUnit;
+    }
+
+    public void setPackageUnit(Integer packageUnit) {
+        this.packageUnit = packageUnit;
+    }
+
     public String getPackageName() {
         return packageName;
     }
@@ -145,14 +153,6 @@ public class PayOrderItem implements Serializable {
 
     public void setPackageDesc(String packageDesc) {
         this.packageDesc = packageDesc;
-    }
-
-    public Integer getPackageUnit() {
-        return packageUnit;
-    }
-
-    public void setPackageUnit(Integer packageUnit) {
-        this.packageUnit = packageUnit;
     }
 
     public BigDecimal getOriginalPrice() {
@@ -211,11 +211,11 @@ public class PayOrderItem implements Serializable {
         this.deviceLimit = deviceLimit;
     }
 
-    public Integer getSpeedLimit() {
+    public Long getSpeedLimit() {
         return speedLimit;
     }
 
-    public void setSpeedLimit(Integer speedLimit) {
+    public void setSpeedLimit(Long speedLimit) {
         this.speedLimit = speedLimit;
     }
 
@@ -249,9 +249,9 @@ public class PayOrderItem implements Serializable {
         "id=" + id +
         ", orderCode=" + orderCode +
         ", packageId=" + packageId +
+        ", packageUnit=" + packageUnit +
         ", packageName=" + packageName +
         ", packageDesc=" + packageDesc +
-        ", packageUnit=" + packageUnit +
         ", originalPrice=" + originalPrice +
         ", salePrice=" + salePrice +
         ", discount=" + discount +

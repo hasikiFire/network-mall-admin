@@ -28,6 +28,7 @@
 		<jjwt.version>0.11.5</jjwt.version>
 		<hutool.version>5.8.11</hutool.version>
 		<lombok.version>1.18.36</lombok.version>
+		<fastjson.version>1.2.83</fastjson.version>
 	</properties>
 	<dependencies>
 
@@ -107,6 +108,13 @@
 			<artifactId>hutool-all</artifactId>
 			<version>${hutool.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>${fastjson.version}</version>
+		</dependency>
+
 		<!-- 邮件 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -129,6 +137,7 @@
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
 		</dependency>
+
 
 		<!-- MQ 相关 -->
 		<!-- <dependency>

@@ -112,13 +112,14 @@ public class UsageRecordServiceImpl extends ServiceImpl<UsageRecordMapper, Usage
     usageRecord.setPurchaseStartTime(params.getPurchaseStartTime());
     usageRecord.setPurchaseEndTime(params.getPurchaseEndTime());
     usageRecord.setConsumedDataTransfer(0L);
-    usageRecord.setDeviceNum(params.getDeviceNum());
+    usageRecord.setDeviceLimit(params.getDeviceLimit());
     usageRecord.setDataAllowance(params.getDataAllowance());
     usageRecord.setSpeedLimit(params.getSpeedLimit());
 
     try {
       usageRecordMapper.insert(usageRecord);
       // 插入记录后，监听服务器会自动识别
+      // TODO xxl-job 启动
     } catch (Exception e) {
       // 记录错误日志并抛出异常
       log.error("使用记录创建失败", e);

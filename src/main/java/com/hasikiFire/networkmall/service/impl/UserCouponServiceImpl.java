@@ -53,4 +53,22 @@ public class UserCouponServiceImpl extends ServiceImpl<UserCouponMapper, UserCou
 
     return RestResp.ok(coupon);
   }
+
+  @Override
+  public RestResp<UserCoupon> getCouponByCode(String code) {
+    LambdaQueryWrapper<UserCoupon> queryWrapper = new LambdaQueryWrapper<>();
+    queryWrapper.eq(UserCoupon::getCode, code);
+    UserCoupon coupon = this.getOne(queryWrapper);
+
+    if (coupon == null) {
+      return RestResp.fail("优惠券不存在");
+    }
+
+    LocalDateTime now = LocalDateTime.now();
+    if (now.isAfter(coupon.getExpireTime())) {
+      return RestResp.fail("优惠券已过期");
+    }
+
+    return RestResp.ok(coupon);
+  }
 }

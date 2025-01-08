@@ -42,12 +42,12 @@ public class PackageEditReqDto {
   @Schema(description = "折扣结束日期")
   private LocalDateTime discountEndDate;
 
-  @Schema(description = "数据额度，单位GB")
-  private Integer dataAllowance;
+  @Schema(description = "数据额度，单位B")
+  private Long dataAllowance;
 
   @Schema(description = "设备限制数量，不传则不限制")
   private Integer deviceLimit;
 
-  @Schema(description = "速度限制，单位MB，不传则不限制")
-  private Integer speedLimit;
+  @Schema(description = "速度限制，单位B，不传则不限制")
+  private Long speedLimit;
 }

@@ -447,7 +447,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     // 从配置中获取 subscribeHost
     String subscribeHost = configMapper.selectList(new QueryWrapper<Config>().eq("type", "subscribe"))
         .stream()
-        .filter(config -> "subscribeHost".equals(config.getItem()))
+        .filter(config -> "subscribeHost".equals(config.getCode()))
         .map(Config::getValue)
         .findFirst()
         .orElse(""); // 默认值为空字符串

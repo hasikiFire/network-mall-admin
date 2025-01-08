@@ -32,4 +32,9 @@ public interface UserCouponService extends IService<UserCoupon> {
    * @return 是否有效
    */
   RestResp<UserCoupon> validateCoupon(String couponCode);
+
+  /**
+   * 根据 code 获取优惠券
+   */
+  RestResp<UserCoupon> getCouponByCode(String code);
 }

@@ -77,9 +77,9 @@ public class PackageItem implements Serializable {
     private Integer deviceLimit;
 
     /**
-     * 速率限制（单位：MB）
+     * 速率限制（单位：B）
      */
-    private Integer speedLimit;
+    private Long speedLimit;
 
     /**
      * 是否已删除 1：已删除 0：未删除
@@ -185,11 +185,11 @@ public class PackageItem implements Serializable {
         this.deviceLimit = deviceLimit;
     }
 
-    public Integer getSpeedLimit() {
+    public Long getSpeedLimit() {
         return speedLimit;
     }
 
-    public void setSpeedLimit(Integer speedLimit) {
+    public void setSpeedLimit(Long speedLimit) {
         this.speedLimit = speedLimit;
     }
 
