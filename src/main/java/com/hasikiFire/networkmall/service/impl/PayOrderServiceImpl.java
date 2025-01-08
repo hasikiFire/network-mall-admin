@@ -53,7 +53,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     payOrder.setUserId(reqDto.getUserId());
     payOrder.setPackageId(reqDto.getPackageId());
     payOrder.setPackageUnit(reqDto.getMonth());
-    payOrder.setOrderStatus("wait_pay");
+    payOrder.setOrderStatus("paid");
     payOrder.setPayWay(reqDto.getPayWay());
     BigDecimal orderAmount = calculateOrderAmount(packageItem, reqDto);
     payOrder.setOrderAmount(orderAmount);
