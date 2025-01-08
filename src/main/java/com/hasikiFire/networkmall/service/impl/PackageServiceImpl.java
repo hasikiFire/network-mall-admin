@@ -178,6 +178,13 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
     if (user == null) {
       throw new BusinessException("用户不存在");
     }
+    if (reqDto.getDataAllowance() != null) {
+      packageItem.setDataAllowance(reqDto.getDataAllowance());
+    }
+    if (reqDto.getDeviceLimit() != null) {
+      packageItem.setDeviceLimit(reqDto.getDeviceLimit());
+    }
+
     try {
 
       PayOrder payOrder = payOrderService.createOrder(packageItem, reqDto);

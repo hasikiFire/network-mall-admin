@@ -36,7 +36,7 @@ public class UserCouponController {
     return userCouponService.getCouponDetail(id);
   }
 
-  @PostMapping("/validate")
+  @GetMapping("/validate")
   public RestResp<UserCoupon> validateCoupon(@RequestParam String couponCode) {
     return userCouponService.validateCoupon(couponCode);
   }

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author ${author}
- * @since 2025/01/07
+ * @since 2025/01/08
  */
 @TableName("user_coupon")
 public class UserCoupon implements Serializable {
@@ -38,7 +38,7 @@ public class UserCoupon implements Serializable {
     /**
      * 优惠码限制
      */
-    private String limit;
+    private String usageLimit;
 
     /**
      * 累计使用次数
@@ -80,12 +80,12 @@ public class UserCoupon implements Serializable {
         this.content = content;
     }
 
-    public String getLimit() {
-        return limit;
+    public String getUsageLimit() {
+        return usageLimit;
     }
 
-    public void setLimit(String limit) {
-        this.limit = limit;
+    public void setUsageLimit(String usageLimit) {
+        this.usageLimit = usageLimit;
     }
 
     public Integer getUseCount() {
@@ -118,7 +118,7 @@ public class UserCoupon implements Serializable {
         "id=" + id +
         ", code=" + code +
         ", content=" + content +
-        ", limit=" + limit +
+        ", usageLimit=" + usageLimit +
         ", useCount=" + useCount +
         ", createTime=" + createTime +
         ", expireTime=" + expireTime +

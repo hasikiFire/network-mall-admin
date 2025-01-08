@@ -235,7 +235,7 @@ CREATE TABLE `user_coupon` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '优惠码ID',
   `code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '优惠码',
   `content` json NOT NULL COMMENT '优惠码内容',
-  `limit` json NOT NULL COMMENT '优惠码限制',
+  `usage_limit` json NOT NULL COMMENT '优惠码限制',
   `use_count` int unsigned NOT NULL DEFAULT '0' COMMENT '累计使用次数',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `expire_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '过期时间',

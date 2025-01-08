@@ -120,12 +120,12 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     }
 
     try {
+
       // 获取优惠券
       RestResp<UserCoupon> couponResp = userCouponService.getCouponByCode(reqDto.getCouponCode());
       if (couponResp == null || couponResp.getData() == null) {
-        return BigDecimal.ZERO;
+        return orderAmount;
       }
-
       // 解析优惠券内容
       JSONObject content = JSONObject.parseObject(couponResp.getData().getContent());
       Integer amount = content.getInteger("amount");

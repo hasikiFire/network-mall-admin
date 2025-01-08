@@ -9,6 +9,7 @@ import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.dao.entity.PayOrderItem;
 import com.hasikiFire.networkmall.service.PayOrderItemService;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -26,6 +27,7 @@ public class PayOrderItemController {
 
   private final PayOrderItemService payOrderItemService;
 
+  @SaCheckLogin
   @GetMapping("/detail")
   public RestResp<PayOrderItem> getOrderItemDetail(@RequestParam String orderCode) {
     return payOrderItemService.getOrderItemByOrderCode(orderCode);

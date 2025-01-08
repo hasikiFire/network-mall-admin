@@ -19,6 +19,7 @@ import com.hasikiFire.networkmall.dto.resp.PackageListRespDto;
 import com.hasikiFire.networkmall.dto.resp.PackageRespDto;
 import com.hasikiFire.networkmall.service.PackageService;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,7 @@ public class PackageController {
     return packageService.getUserPackageList(params);
   }
 
+  @SaCheckLogin
   @Operation(summary = "购买套餐")
   @PostMapping("/buy")
   public RestResp<PackageRespDto> buyPackage(@Valid @RequestBody PackageBuyReqDto params) {

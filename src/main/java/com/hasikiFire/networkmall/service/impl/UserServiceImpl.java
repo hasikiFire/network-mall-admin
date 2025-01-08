@@ -470,12 +470,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     RestResp<PageRespDto<ForeignServerListRespDto>> response = foreignServerService.getForeignServerList(reqdto);
 
     ArrayList<ClashHttpProxy> clashHttpProxies = new ArrayList<ClashHttpProxy>();
-
-    List<ForeignServerListRespDto> records = new ArrayList<>();
+    List<? extends ForeignServerListRespDto> records = new ArrayList<>();
     if (response.getCode() == 200 && response.getData() != null) {
-      records = (List<ForeignServerListRespDto>) response.getData().getList();
+      records = response.getData().getList();
     } else {
-      log.info("[generateSubscribe] faild: {}", response.getMessage());
+      log.info("[generateSubscribe] failed: {}", response.getMessage());
     }
 
     User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, linkItem.getUserId()));
