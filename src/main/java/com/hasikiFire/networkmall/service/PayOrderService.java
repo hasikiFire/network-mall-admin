@@ -3,6 +3,7 @@ package com.hasikiFire.networkmall.service;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.dao.entity.PackageItem;
 import com.hasikiFire.networkmall.dao.entity.PayOrder;
+import com.hasikiFire.networkmall.dto.req.CancelOrderReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageBuyReqDto;
 import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
@@ -40,7 +41,7 @@ public interface PayOrderService extends IService<PayOrder> {
    * @param orderId 订单id
    * @return 是否取消成功
    */
-  Boolean cancelOrder(Long orderId);
+  RestResp<Boolean> cancelOrder(CancelOrderReqDto reqDto);
 
   /**
    * 获取订单状态

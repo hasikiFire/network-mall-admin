@@ -7,6 +7,7 @@ import com.hasikiFire.networkmall.dao.entity.PackageItem;
 import com.hasikiFire.networkmall.dao.entity.PayOrder;
 import com.hasikiFire.networkmall.dao.entity.UserCoupon;
 import com.hasikiFire.networkmall.dao.mapper.PayOrderMapper;
+import com.hasikiFire.networkmall.dto.req.CancelOrderReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageBuyReqDto;
 import com.hasikiFire.networkmall.service.ConfigService;
 import com.hasikiFire.networkmall.service.PayOrderService;
@@ -172,9 +173,29 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
   }
 
   @Override
-  public Boolean cancelOrder(Long orderId) {
+  public RestResp<Boolean> cancelOrder(CancelOrderReqDto reqDto) {
+    // 查询订单
+    PayOrder order = payOrderMapper.selectOne(new LambdaQueryWrapper<PayOrder>()
+        .eq(PayOrder::getOrderCode, reqDto.getOrderCode()));
+    if (order == null) {
+      throw new BusinessException("订单不存在");
+    }
 
-    throw new UnsupportedOperationException("Unimplemented method 'cancelOrder'");
+    // 检查订单状态是否可取消（只有未支付的订单可以取消）
+    if (!"wait_pay".equals(order.getOrderStatus())) {
+      throw new BusinessException("该订单状态不可取消");
+    }
+
+    try {
+      // 更新订单状态为已取消
+      order.setOrderStatus("canceled");
+      payOrderMapper.updateById(order);
+
+      return RestResp.ok(true);
+    } catch (Exception e) {
+      log.error("取消订单失败", e);
+      throw new BusinessException("取消订单失败");
+    }
   }
 
   @Override

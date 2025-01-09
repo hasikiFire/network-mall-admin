@@ -59,7 +59,7 @@ CREATE TABLE pay_order (
   order_create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '订单创建日期',
   order_expire_time timestamp DEFAULT NULL COMMENT '订单过期日期',
   order_status varchar(16) NOT NULL DEFAULT 'wait_pay' COMMENT '订单状态， wait_pay(待支付)、
-  paid(已支付)refunding退款中)、refunded(已退款)、closed(订单关闭)',
+  paid(已支付)refunding退款中)、refunded(已退款)、closed(订单关闭)、canceled(订单取消)',
   order_remark varchar(128) COMMENT '订单备注',
   -- 支付
   order_amount decimal(10, 2) NOT NULL DEFAULT '0.00' COMMENT '订单金额',

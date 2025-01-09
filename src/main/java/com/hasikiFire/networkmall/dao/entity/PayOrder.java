@@ -3,6 +3,9 @@ package com.hasikiFire.networkmall.dao.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -15,145 +18,175 @@ import java.time.LocalDateTime;
  * @author ${author}
  * @since 2025/01/08
  */
+@Schema(description = "订单表")
 @TableName("pay_order")
 public class PayOrder implements Serializable {
-
     private static final long serialVersionUID = 1L;
 
     /**
      * 主键
      */
     @TableId(value = "id", type = IdType.AUTO)
+    @Schema(description = "主键", example = "1")
     private Long id;
 
     /**
      * 订单号
      */
+    @Schema(description = "订单号", example = "ORD123456789")
     private String orderCode;
 
     /**
      * 外部支付系统交易号
      */
+    @Schema(description = "外部支付系统交易号", example = "TRADE123456789")
     private String tradeNo;
 
     /**
      * 用户ID
      */
+    @Schema(description = "用户ID", example = "1001")
     private Long userId;
 
     /**
      * 套餐计划主键
      */
+    @Schema(description = "套餐计划主键", example = "2001")
     private Long packageId;
 
     /**
      * 计费周期。单位：月份
      */
+    @Schema(description = "计费周期，单位：月份", example = "12")
     private Integer packageUnit;
 
     /**
      * 订单创建日期
      */
+    @Schema(description = "订单创建日期", example = "2025-01-08T10:00:00")
     private LocalDateTime orderCreateTime;
 
     /**
      * 订单过期日期
      */
+    @Schema(description = "订单过期日期", example = "2026-01-08T10:00:00")
     private LocalDateTime orderExpireTime;
 
     /**
-     * 订单状态， wait_pay(待支付)、 paid(已支付)refunding退款中)、refunded(已退款)、closed(订单关闭)
+     * 订单状态，wait_pay(待支付)、paid(已支付)、refunding(退款中)、refunded(已退款)、closed(订单关闭)、canceled(订单取消)
      */
+    @Schema(description = "订单状态", example = "wait_pay", allowableValues = { "wait_pay", "paid", "refunding", "refunded",
+            "closed" })
     private String orderStatus;
 
     /**
      * 订单金额
      */
+    @Schema(description = "订单金额", example = "99.99")
     private BigDecimal orderAmount;
 
     /**
      * 支付金额
      */
+    @Schema(description = "支付金额", example = "99.99")
     private BigDecimal payAmount;
 
     /**
      * 订单备注
      */
+    @Schema(description = "订单备注", example = "这是一条订单备注")
     private String orderRemark;
 
     /**
      * 支付时间
      */
+    @Schema(description = "支付时间", example = "2025-01-08T10:05:00")
     private LocalDateTime payTime;
 
     /**
-     * 支付方式: wxpay(微信支付)、alipay支付宝支付),USTD(加密货币交易)
+     * 支付方式: wxpay(微信支付)、alipay(支付宝支付)、USTD(加密货币交易)
      */
+    @Schema(description = "支付方式", example = "wxpay", allowableValues = { "wxpay", "alipay", "USTD" })
     private String payWay;
 
     /**
-     * ONLINE_PAY(在线支付)、QRCODE_SCAN_PAY（扫码支), QRCODE_SHOW_PAY(付款码支付)
+     * ONLINE_PAY(在线支付)、QRCODE_SCAN_PAY（扫码支付）、QRCODE_SHOW_PAY(付款码支付)
      */
+    @Schema(description = "支付场景", example = "ONLINE_PAY", allowableValues = { "ONLINE_PAY", "QRCODE_SCAN_PAY",
+            "QRCODE_SHOW_PAY" })
     private String paySeene;
 
     /**
-     * 支付状态， waiting(待支付)、success(支付成功)，failed(支付失败)
+     * 支付状态，waiting(待支付)、success(支付成功)、failed(支付失败)
      */
+    @Schema(description = "支付状态", example = "success", allowableValues = { "waiting", "success", "failed" })
     private String payStatus;
 
     /**
      * 优惠券编码
      */
+    @Schema(description = "优惠券编码", example = "COUPON123")
     private String couponCode;
 
     /**
      * 已优惠金额
      */
+    @Schema(description = "已优惠金额", example = "10.00")
     private BigDecimal couponAmount;
 
     /**
      * 收款商户ID
      */
+    @Schema(description = "收款商户ID", example = "SUP123456")
     private String supplierId;
 
     /**
      * 退款单号
      */
+    @Schema(description = "退款单号", example = "REFUND123456")
     private LocalDateTime refundNo;
 
     /**
      * 退款请求时间
      */
+    @Schema(description = "退款请求时间", example = "2025-01-08T10:10:00")
     private LocalDateTime refundReqTime;
 
     /**
      * 退款时间
      */
+    @Schema(description = "退款时间", example = "2025-01-08T10:15:00")
     private LocalDateTime refundTime;
 
     /**
      * 退款金额
      */
+    @Schema(description = "退款金额", example = "99.99")
     private BigDecimal refundAmount;
 
     /**
-     * 退款状态，refunding(退款中)、part_refunded(部分退款)、all_refunded(全部退款)、rejected(已拒绝
+     * 退款状态，refunding(退款中)、part_refunded(部分退款)、all_refunded(全部退款)、rejected(已拒绝)
      */
+    @Schema(description = "退款状态", example = "refunding", allowableValues = { "refunding", "part_refunded",
+            "all_refunded", "rejected" })
     private String refundStatus;
 
     /**
      * 是否已删除 1：已删除 0：未删除
      */
+    @Schema(description = "是否已删除", example = "0", allowableValues = { "0", "1" })
     private Integer deleted;
 
     /**
      * 创建时间
      */
+    @Schema(description = "创建时间", example = "2025-01-08T10:00:00")
     private LocalDateTime createdAt;
 
     /**
      * 更新时间
      */
+    @Schema(description = "更新时间", example = "2025-01-08T10:00:00")
     private LocalDateTime updatedAt;
 
     public Long getId() {

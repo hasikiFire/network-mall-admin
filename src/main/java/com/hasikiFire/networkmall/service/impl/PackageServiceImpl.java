@@ -4,14 +4,12 @@ import com.hasikiFire.networkmall.core.common.exception.BusinessException;
 import com.hasikiFire.networkmall.core.common.req.PageReqDto;
 import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
-import com.hasikiFire.networkmall.core.util.RateLimiter;
 import com.hasikiFire.networkmall.dao.entity.PackageItem;
 import com.hasikiFire.networkmall.dao.entity.PayOrder;
-import com.hasikiFire.networkmall.dao.entity.PayOrderItem;
+import com.hasikiFire.networkmall.dao.entity.UsageRecord;
 import com.hasikiFire.networkmall.dao.entity.User;
 import com.hasikiFire.networkmall.dao.mapper.PackageMapper;
-import com.hasikiFire.networkmall.dao.mapper.PayOrderItemMapper;
-import com.hasikiFire.networkmall.dao.mapper.PayOrderMapper;
+import com.hasikiFire.networkmall.dao.mapper.UsageRecordMapper;
 import com.hasikiFire.networkmall.dao.mapper.UserMapper;
 import com.hasikiFire.networkmall.dto.req.PackageAddReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageBuyReqDto;
@@ -20,14 +18,11 @@ import com.hasikiFire.networkmall.dto.req.PackageListReqDto;
 import com.hasikiFire.networkmall.dto.req.UsageRecordAddReqDto;
 import com.hasikiFire.networkmall.dto.resp.PackageListRespDto;
 import com.hasikiFire.networkmall.dto.resp.PackageRespDto;
-import com.hasikiFire.networkmall.dto.resp.UserListRespDto;
 import com.hasikiFire.networkmall.service.PackageService;
 import com.hasikiFire.networkmall.service.PayOrderItemService;
 import com.hasikiFire.networkmall.service.PayOrderService;
 import com.hasikiFire.networkmall.service.UsageRecordService;
 
-import cn.hutool.core.lang.Snowflake;
-import cn.hutool.core.util.IdUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +32,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,6 +57,7 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
   private final PayOrderService payOrderService;
   private final PayOrderItemService payOrderItemService;
   private final UsageRecordService usageRecordService;
+  private final UsageRecordMapper usageRecordMapper;
   // private final RateLimiter rateLimiter;
 
   @Override
@@ -185,6 +180,17 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
       packageItem.setDeviceLimit(reqDto.getDeviceLimit());
     }
 
+    UsageRecord usageRecord = usageRecordMapper.selectOne(new LambdaQueryWrapper<UsageRecord>()
+        .eq(UsageRecord::getUserId, reqDto.getUserId()).eq(UsageRecord::getPurchaseStatus, 1));
+    if (usageRecord != null) {
+      // TODO
+      // 简单方案：旧的的废弃，新的套餐生效
+      // 复杂方案：
+      // 1. 已有已生效套餐：流量延长，时间延长
+      // 2. 未有已生效套餐：新的直接生效
+      return RestResp.error("您有未过期的套餐，请先使用完再购买");
+    }
+
     try {
 
       PayOrder payOrder = payOrderService.createOrder(packageItem, reqDto);
@@ -195,6 +201,8 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
       payOrderService.payOrder(payOrder.getOrderCode());
       //
       // TODO 假设订单支付成功生成使用记录
+      // 查询是否有旧的未过期的套餐，有则更新结束时间，没有则新增
+
       UsageRecordAddReqDto usageRecordAddReqDto = new UsageRecordAddReqDto();
       usageRecordAddReqDto.setOrderCode(payOrder.getOrderCode());
       usageRecordAddReqDto.setUserId(reqDto.getUserId());

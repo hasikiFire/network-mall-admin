@@ -14,7 +14,7 @@ import lombok.Data;
 public class UserLoginRespDto {
 
     @Schema(description = "用户ID")
-    private Long uid;
+    private Long userID;
 
     @Schema(description = "用户token")
     private String token;
