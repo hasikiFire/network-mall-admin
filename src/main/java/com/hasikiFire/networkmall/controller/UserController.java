@@ -122,7 +122,7 @@ public class UserController {
   }
 
   private String buildSubscriptionUserInfo(SubscribeRespDto result) {
-    return String.format("upload=%d;download=%d;total=%d;expire=%d;",
+    return String.format("upload=%s;download=%s;total=%s;expire=%s;",
         result.getConsumedDataUpload(),
         result.getConsumedDataDownload(),
         result.getConsumedDataTransfer(),

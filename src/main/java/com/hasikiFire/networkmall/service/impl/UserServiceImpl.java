@@ -481,17 +481,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
       return SubscribeRespDto.builder()
           .yamlContent(yamlContent)
-          .expire(expire)
-          .consumedDataDownload(usageRecord.getConsumedDataDownload().toString())
-          .consumedDataUpload(usageRecord.getConsumedDataUpload().toString())
-          .consumedDataTransfer(usageRecord.getConsumedDataTransfer().toString())
+          .expire(expire.toString())
+          .consumedDataDownload(
+              usageRecord.getConsumedDataDownload() != null ? usageRecord.getConsumedDataDownload().toString() : "0")
+          .consumedDataUpload(
+              usageRecord.getConsumedDataUpload() != null ? usageRecord.getConsumedDataUpload().toString() : "0")
+          .consumedDataTransfer(
+              usageRecord.getConsumedDataTransfer() != null ? usageRecord.getConsumedDataTransfer().toString() : "0")
           .filename(filename)
           .webPagwUrl(webPagwUrl)
           .build();
 
     } catch (Exception e) {
       log.error("[generateSubscribe] error: {}", e.getMessage());
-      throw new BusinessException("生成订阅内容");
+      throw new BusinessException("生成订阅内容失败");
     }
 
   }

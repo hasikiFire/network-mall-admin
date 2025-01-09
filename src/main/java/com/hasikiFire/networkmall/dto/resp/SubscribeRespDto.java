@@ -20,7 +20,7 @@ public class SubscribeRespDto {
   private String consumedDataTransfer;
 
   @Schema(description = "用户过期时间")
-  private Long expire;
+  private String expire;
 
   @Schema(description = "主页地址")
   private String webPagwUrl;
