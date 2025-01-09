@@ -28,5 +28,11 @@ COPY --from=builder /app/target/network-mall-admin.jar /app/app.jar
 # 暴露应用程序端口
 EXPOSE 8080
 
+# 定义构建参数
+ARG SPRING_PROFILES_ACTIVE=test
+
+# 设置环境变量
+ENV SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+
 # 启动 Spring Boot 应用程序
-CMD ["java", "-jar", "app.jar"]
+CMD ["java", "-jar", "app.jar", "--spring.profiles.active=${SPRING_PROFILES_ACTIVE}"]

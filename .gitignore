@@ -30,6 +30,7 @@ build/
 !**/src/test/**/build/
 application-dev.yml
 application-prod.yml
+application-test.yml
 GeneratorDev.java
 
 ### VS Code ###

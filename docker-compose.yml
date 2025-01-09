@@ -1,9 +1,10 @@
 version: "3.8"
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: network-mall-admin
+    image: network-mall-admin-${SPRING_PROFILES_ACTIVE:-test} # 动态设置镜像名称
+    container_name: network-mall-admin-${SPRING_PROFILES_ACTIVE:-test} # 动态设置容器名称
     ports:
       - "29999:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-test} # 默认使用 test 环境
+    restart: always
