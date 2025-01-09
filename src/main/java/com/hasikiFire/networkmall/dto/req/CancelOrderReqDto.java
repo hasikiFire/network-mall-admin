@@ -10,7 +10,7 @@ public class CancelOrderReqDto {
 
   @Schema(description = "订单Code", required = true)
   @NotNull(message = "订单ID不能为空")
-  private Long orderCode;
+  private String orderCode;
 
   @Schema(description = "取消原因")
   private String cancelReason;
