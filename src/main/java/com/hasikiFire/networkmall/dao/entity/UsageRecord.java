@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author ${author}
- * @since 2025/01/06
+ * @since 2025/01/09
  */
 @TableName("usage_record")
 public class UsageRecord implements Serializable {
@@ -64,6 +64,16 @@ public class UsageRecord implements Serializable {
      * 用户已消耗的流量（单位：B）
      */
     private Long consumedDataTransfer;
+
+    /**
+     * 用户已消耗的下行流量（单位：B）
+     */
+    private Long consumedDataDownload;
+
+    /**
+     * 用户已消耗的上行流量（单位：B）
+     */
+    private Long consumedDataUpload;
 
     /**
      * 流量速率限额（单位：B）
@@ -168,6 +178,22 @@ public class UsageRecord implements Serializable {
         this.consumedDataTransfer = consumedDataTransfer;
     }
 
+    public Long getConsumedDataDownload() {
+        return consumedDataDownload;
+    }
+
+    public void setConsumedDataDownload(Long consumedDataDownload) {
+        this.consumedDataDownload = consumedDataDownload;
+    }
+
+    public Long getConsumedDataUpload() {
+        return consumedDataUpload;
+    }
+
+    public void setConsumedDataUpload(Long consumedDataUpload) {
+        this.consumedDataUpload = consumedDataUpload;
+    }
+
     public Long getSpeedLimit() {
         return speedLimit;
     }
@@ -228,6 +254,8 @@ public class UsageRecord implements Serializable {
         ", purchaseEndTime=" + purchaseEndTime +
         ", dataAllowance=" + dataAllowance +
         ", consumedDataTransfer=" + consumedDataTransfer +
+        ", consumedDataDownload=" + consumedDataDownload +
+        ", consumedDataUpload=" + consumedDataUpload +
         ", speedLimit=" + speedLimit +
         ", deviceNum=" + deviceNum +
         ", deviceLimit=" + deviceLimit +

@@ -2,6 +2,8 @@ package com.hasikiFire.networkmall.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
 import java.io.Serializable;
 
 /**
@@ -12,6 +14,7 @@ import java.io.Serializable;
  * @author ${author}
  * @since 2025/01/07
  */
+@TableName("config")
 public class Config implements Serializable {
 
     private static final long serialVersionUID = 1L;

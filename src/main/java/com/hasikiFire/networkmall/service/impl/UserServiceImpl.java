@@ -41,6 +41,7 @@ import com.hasikiFire.networkmall.dto.req.UserLoginReqDto;
 import com.hasikiFire.networkmall.dto.req.UserRegisterReqDto;
 import com.hasikiFire.networkmall.dto.req.UsersendEmailCodeDto;
 import com.hasikiFire.networkmall.dto.resp.ForeignServerListRespDto;
+import com.hasikiFire.networkmall.dto.resp.SubscribeRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserInfoRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserListRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserLoginRespDto;
@@ -59,6 +60,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -398,35 +400,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
   @Override
   public RestResp<String> getSubscribe() {
-    // String token = "";
-    // Long userID = Long.parseLong(StpUtil.getLoginId().toString());
-    // Link tempLink = linkMapper.selectOne(new QueryWrapper<Link>().eq("user_id",
-    // userID));
-    // if (tempLink != null) {
-    // token = tempLink.getToken();
-    // } else {
-    // token = TokenGenerator.generateToken();
-    // Link newLink = new Link();
-    // newLink.setToken(token);
-    // newLink.setUserId(userID);
-    // linkMapper.insert(newLink);
-    // }
-
-    // String subscribeHost = "";
-    // List<Config> subscribeConfigs = configMapper.selectList(new
-    // QueryWrapper<Config>().eq("type", "subscribe"));
-    // // 使用传统的 for 循环
-    // for (Config config : subscribeConfigs) {
-    // if ("subscribeHost".equals(config.getItem())) {
-    // subscribeHost = config.getValue();
-    // break; // 如果只需要找到第一个匹配项，可以在这里跳出循环
-    // }
-    // }
-    // String finalLink = "https://" + subscribeHost + "/user/subscribe" + "?token="
-    // + token;
-    // return RestResp.ok(finalLink);
-
-    // // 获取当前用户ID
+    // 获取当前用户ID
     Long userID = Long.parseLong(StpUtil.getLoginId().toString());
 
     log.info("User getLoginId: {}", StpUtil.getLoginId());
@@ -458,41 +432,67 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   }
 
   @Override
-  public String generateSubscribe(String token) {
-    Link linkItem = linkMapper.selectOne(new QueryWrapper<Link>().eq("token", token));
-    if (linkItem == null) {
-      throw new BusinessException("token不存在");
-    }
-    ForeignServerListReqDto reqdto = ForeignServerListReqDto.builder()
-        .status(1) // 其他属性
-        .build();
-    reqdto.setFetchAll(true); // 手动设置 fetchAll.
-    RestResp<PageRespDto<ForeignServerListRespDto>> response = foreignServerService.getForeignServerList(reqdto);
+  public SubscribeRespDto generateSubscribe(String token) {
+    try {
+      Link linkItem = linkMapper.selectOne(new QueryWrapper<Link>().eq("token", token));
+      if (linkItem == null) {
+        throw new BusinessException("token不存在");
+      }
+      ForeignServerListReqDto reqdto = ForeignServerListReqDto.builder()
+          .status(1) // 其他属性
+          .build();
+      reqdto.setFetchAll(true); // 手动设置 fetchAll.
+      RestResp<PageRespDto<ForeignServerListRespDto>> response = foreignServerService.getForeignServerList(reqdto);
 
-    ArrayList<ClashHttpProxy> clashHttpProxies = new ArrayList<ClashHttpProxy>();
-    List<? extends ForeignServerListRespDto> records = new ArrayList<>();
-    if (response.getCode() == 200 && response.getData() != null) {
-      records = response.getData().getList();
-    } else {
-      log.info("[generateSubscribe] failed: {}", response.getMessage());
-    }
+      ArrayList<ClashHttpProxy> clashHttpProxies = new ArrayList<ClashHttpProxy>();
+      List<? extends ForeignServerListRespDto> records = new ArrayList<>();
+      if (response.getCode() == 200 && response.getData() != null) {
+        records = response.getData().getList();
+      } else {
+        log.info("[generateSubscribe] failed: {}", response.getMessage());
+      }
 
-    User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, linkItem.getUserId()));
-    log.info("[generateSubscribe] 查询服务器记录条数: {}", records.size());
-    for (ForeignServerListRespDto record : records) {
-      ClashHttpProxy clashHttpProxy = ClashHttpProxy.builder()
-          .name(record.getServerName())
-          .server(record.getDomainName())
-          .port(record.getPort())
-          .username(Long.toString(user.getId()))
-          .password(user.getPasswordHash())
+      User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, linkItem.getUserId()));
+      log.info("[generateSubscribe] 查询服务器记录条数: {}", records.size());
+      for (ForeignServerListRespDto record : records) {
+        ClashHttpProxy clashHttpProxy = ClashHttpProxy.builder()
+            .name(record.getServerName())
+            .server(record.getDomainName())
+            .port(record.getPort())
+            .username(Long.toString(user.getId()))
+            .password(user.getPasswordHash())
+            .build();
+
+        clashHttpProxies.add(clashHttpProxy);
+      }
+
+      String yamlContent = YamlBuilder.buildYaml(clashHttpProxies);
+
+      UsageRecord usageRecord = usageRecordMapper
+          .selectOne(new QueryWrapper<UsageRecord>().eq("user_id", linkItem.getUserId()));
+      if (usageRecord == null) {
+        throw new BusinessException("用户没有购买套餐");
+      }
+      Long expire = usageRecord.getPurchaseEndTime().toEpochSecond(ZoneOffset.UTC);
+      String filename = configMapper
+          .selectOne(new LambdaQueryWrapper<Config>().eq(Config::getCode, "filename").last("limit 1")).getValue();
+      String webPagwUrl = configMapper
+          .selectOne(new LambdaQueryWrapper<Config>().eq(Config::getCode, "webPagwUrl").last("limit 1")).getValue();
+
+      return SubscribeRespDto.builder()
+          .yamlContent(yamlContent)
+          .expire(expire)
+          .consumedDataDownload(usageRecord.getConsumedDataDownload().toString())
+          .consumedDataUpload(usageRecord.getConsumedDataUpload().toString())
+          .consumedDataTransfer(usageRecord.getConsumedDataTransfer().toString())
+          .filename(filename)
+          .webPagwUrl(webPagwUrl)
           .build();
 
-      clashHttpProxies.add(clashHttpProxy);
+    } catch (Exception e) {
+      log.error("[generateSubscribe] error: {}", e.getMessage());
+      throw new BusinessException("生成订阅内容");
     }
-
-    String yamlContent = YamlBuilder.buildYaml(clashHttpProxies);
-    return yamlContent;
 
   }
 }

@@ -9,6 +9,7 @@ import com.hasikiFire.networkmall.dto.req.UserListReqDto;
 import com.hasikiFire.networkmall.dto.req.UserLoginReqDto;
 import com.hasikiFire.networkmall.dto.req.UserRegisterReqDto;
 import com.hasikiFire.networkmall.dto.req.UsersendEmailCodeDto;
+import com.hasikiFire.networkmall.dto.resp.SubscribeRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserInfoRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserListRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserLoginRespDto;
@@ -59,5 +60,5 @@ public interface UserService extends IService<User> {
 
   RestResp<String> getSubscribe();
 
-  String generateSubscribe(String token);
+  SubscribeRespDto generateSubscribe(String token);
 }

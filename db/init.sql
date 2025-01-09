@@ -129,6 +129,8 @@ CREATE TABLE `usage_record` (
   `purchase_end_time` timestamp NOT NULL COMMENT '结束日期',
   `data_allowance` bigint unsigned NOT NULL COMMENT '数据流量限额（单位：B）',
   `consumed_data_transfer` bigint unsigned DEFAULT NULL COMMENT '用户已消耗的流量（单位：B）',
+  `consumed_data_upload` bigint unsigned DEFAULT NULL COMMENT '用户已消耗的上行流量（单位：B）',
+  `consumed_data_download` bigint unsigned DEFAULT NULL COMMENT '用户已消耗的下行流量（单位：B）',
   `speed_limit` bigint unsigned DEFAULT NULL COMMENT '流量速率限额（单位：B）',
   `device_num` int DEFAULT NULL COMMENT '在线设备数量',
   `device_limit` int DEFAULT NULL COMMENT '在线设备数量限额',
