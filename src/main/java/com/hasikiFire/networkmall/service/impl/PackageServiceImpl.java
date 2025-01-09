@@ -181,7 +181,10 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
     }
 
     UsageRecord usageRecord = usageRecordMapper.selectOne(new LambdaQueryWrapper<UsageRecord>()
-        .eq(UsageRecord::getUserId, reqDto.getUserId()).eq(UsageRecord::getPurchaseStatus, 1));
+        .eq(UsageRecord::getUserId, reqDto.getUserId())
+        .eq(UsageRecord::getPurchaseStatus, 1)
+        .last("LIMIT 1")); // 只取一条记录
+
     if (usageRecord != null) {
       // TODO
       // 简单方案：旧的的废弃，新的套餐生效

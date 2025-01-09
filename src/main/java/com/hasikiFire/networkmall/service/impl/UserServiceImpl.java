@@ -129,7 +129,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     return RestResp.ok(
         UserRegisterRespDto.builder()
             .token(token)
-            .uid(user.getId())
+            .userID(user.getId())
             .build());
   }
 
