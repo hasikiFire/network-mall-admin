@@ -54,7 +54,7 @@ public class YamlBuilder {
     yamlData.put("mode", "Rule");
     yamlData.put("log-level", "info");
     yamlData.put("external-controller", "0.0.0.0:9090");
-    yamlData.put("external-ui", "ui");
+    // yamlData.put("external-ui", "ui");
     yamlData.put("secret", "");
 
     Map<String, Object> dns = new HashMap<>();

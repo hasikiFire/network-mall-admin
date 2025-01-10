@@ -487,7 +487,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
           .consumedDataUpload(
               usageRecord.getConsumedDataUpload() != null ? usageRecord.getConsumedDataUpload().toString() : "0")
           .consumedDataTransfer(
-              usageRecord.getConsumedDataTransfer() != null ? usageRecord.getConsumedDataTransfer().toString() : "0")
+              usageRecord.getDataAllowance() != null ? usageRecord.getDataAllowance().toString() : "0")
           .filename(filename)
           .webPagwUrl(webPagwUrl)
           .build();

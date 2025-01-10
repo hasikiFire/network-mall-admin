@@ -1,6 +1,8 @@
 package com.hasikiFire.networkmall.controller;
 
-import java.util.Map;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -115,7 +117,14 @@ public class UserController {
   private HttpHeaders buildHeaders(SubscribeRespDto result) {
     HttpHeaders headers = new HttpHeaders();
     headers.set(SUBSCRIPTION_USERINFO_HEADER, buildSubscriptionUserInfo(result));
-    headers.set(CONTENT_DISPOSITION_HEADER, String.format(ATTACHMENT_FILENAME_FORMAT, result.getFilename()));
+    String encodedFileName = "";
+    try {
+      encodedFileName = URLEncoder.encode(result.getFilename(), StandardCharsets.UTF_8.toString());
+    } catch (UnsupportedEncodingException e) {
+
+      e.printStackTrace();
+    }
+    headers.set(CONTENT_DISPOSITION_HEADER, String.format(ATTACHMENT_FILENAME_FORMAT, encodedFileName));
     headers.set(PROFILE_UPDATE_INTERVAL_HEADER, String.valueOf(PROFILE_UPDATE_INTERVAL));
     headers.set(PROFILE_WEB_PAGE_URL_HEADER, result.getWebPagwUrl());
     return headers;

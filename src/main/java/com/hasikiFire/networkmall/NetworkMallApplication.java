@@ -1,5 +1,7 @@
 package com.hasikiFire.networkmall;
 
+import java.util.TimeZone;
+
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,6 +18,8 @@ import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerIntercept
 public class NetworkMallApplication {
 
 	public static void main(String[] args) {
+		// 设置默认时区
+		TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
 		SpringApplication.run(NetworkMallApplication.class, args);
 	}
 
