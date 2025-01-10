@@ -193,7 +193,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
       message.setFrom(username);
       message.setTo(emailDto.getEmail());
       message.setSubject("验证码");
-      message.setText("本次" + emailDto.getType().getDesc() + "为: " + code + " ，有效期为 10 分钟");
+      message.setText("本次" + emailDto.getType().getDesc() + "为: " + code + "，有效期为 10 分钟");
       javaMailSender.send(message);
       return RestResp.ok();
     } catch (MailException e) {
