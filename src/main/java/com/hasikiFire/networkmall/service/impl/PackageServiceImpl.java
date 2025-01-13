@@ -36,6 +36,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -203,7 +204,7 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
       // TODO: 调用支付服务获取支付链接
       payOrderService.payOrder(payOrder.getOrderCode());
       //
-      // TODO 假设订单支付成功生成使用记录
+      // TODO 假设订单支付成功生成使用记录，订单需要更新状态
       // 查询是否有旧的未过期的套餐，有则更新结束时间，没有则新增
 
       UsageRecordAddReqDto usageRecordAddReqDto = new UsageRecordAddReqDto();

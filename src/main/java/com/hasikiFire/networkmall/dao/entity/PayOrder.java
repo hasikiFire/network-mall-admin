@@ -3,6 +3,7 @@ package com.hasikiFire.networkmall.dao.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.hasikiFire.networkmall.core.common.enums.OrderStatus;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -77,7 +78,7 @@ public class PayOrder implements Serializable {
      */
     @Schema(description = "订单状态", example = "wait_pay", allowableValues = { "wait_pay", "paid", "refunding", "refunded",
             "closed" })
-    private String orderStatus;
+    private OrderStatus orderStatus;
 
     /**
      * 订单金额
@@ -253,11 +254,11 @@ public class PayOrder implements Serializable {
         this.orderExpireTime = orderExpireTime;
     }
 
-    public String getOrderStatus() {
+    public OrderStatus getOrderStatus() {
         return orderStatus;
     }
 
-    public void setOrderStatus(String orderStatus) {
+    public void setOrderStatus(OrderStatus orderStatus) {
         this.orderStatus = orderStatus;
     }
 
