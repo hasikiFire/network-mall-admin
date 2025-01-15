@@ -38,7 +38,7 @@ public class UsageRecordController {
 
   // 更新套餐使用纪录
   /*
-   * 场景： 定时任务xx-job 设置过期用
+   *  
    */
   @PutMapping("/update")
   public RestResp<UsageRecord> updateRecord(@Valid @RequestBody UsageRecordEditReqDto params) {

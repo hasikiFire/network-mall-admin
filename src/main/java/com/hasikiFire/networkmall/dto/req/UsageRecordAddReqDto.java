@@ -3,6 +3,7 @@ package com.hasikiFire.networkmall.dto.req;
 import java.time.LocalDateTime;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -20,6 +21,9 @@ public class UsageRecordAddReqDto {
   @Schema(description = "用户ID", required = true)
   @NotNull(message = "用户ID不能为空")
   private Long userId;
+
+  @Schema(description = "月份")
+  private Integer month;
 
   @Schema(description = "开始日期", required = true)
   @NotNull(message = "开始日期不能为空")

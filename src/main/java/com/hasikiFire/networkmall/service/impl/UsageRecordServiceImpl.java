@@ -1,5 +1,7 @@
 package com.hasikiFire.networkmall.service.impl;
 
+import com.hasikiFire.networkmall.core.RabbitMQ.UsageRecordExpire;
+import com.hasikiFire.networkmall.core.common.constant.RabbitMQConstants;
 import com.hasikiFire.networkmall.core.common.exception.BusinessException;
 import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
@@ -11,11 +13,7 @@ import com.hasikiFire.networkmall.dto.req.UsageRecordAddReqDto;
 import com.hasikiFire.networkmall.dto.req.UsageRecordEditReqDto;
 import com.hasikiFire.networkmall.dto.resp.PackageListRespDto;
 import com.hasikiFire.networkmall.dto.resp.PackageRespDto;
-import com.hasikiFire.networkmall.dto.resp.UsageRecordDetailRespDto;
 import com.hasikiFire.networkmall.service.UsageRecordService;
-import com.xxl.job.core.context.XxlJobHelper;
-import com.xxl.job.core.handler.annotation.XxlJob;
-
 import cn.dev33.satoken.stp.StpUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +22,17 @@ import lombok.extern.slf4j.Slf4j;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.amqp.core.MessageDeliveryMode;
+import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -45,6 +49,7 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class UsageRecordServiceImpl extends ServiceImpl<UsageRecordMapper, UsageRecord> implements UsageRecordService {
   private final UsageRecordMapper usageRecordMapper;
+  private final RabbitTemplate rabbitTemplate;
 
   @Override
   public RestResp<UsageRecord> recordDetail() {
@@ -125,9 +130,9 @@ public class UsageRecordServiceImpl extends ServiceImpl<UsageRecordMapper, Usage
     usageRecord.setSpeedLimit(params.getSpeedLimit());
 
     try {
-      usageRecordMapper.insert(usageRecord);
       // 插入记录后，监听服务器会自动识别
-      // TODO xxl-job 启动
+      usageRecordMapper.insert(usageRecord);
+      this.addRecordEndQueue(params);
     } catch (Exception e) {
       // 记录错误日志并抛出异常
       log.error("使用记录创建失败", e);
@@ -136,42 +141,46 @@ public class UsageRecordServiceImpl extends ServiceImpl<UsageRecordMapper, Usage
     return usageRecord;
   }
 
-  public static void addJob(String jobHandler, String cron, String param) {
-    // RestTemplate restTemplate = new RestTemplate();
-    // Map<String, Object> request = new HashMap<>();
-    // request.put("jobGroup", 2); // 执行器 ID
-    // request.put("jobDesc", "一个月后执行的任务");
-    // request.put("cron", cron);
-    // request.put("executorHandler", jobHandler);
-    // request.put("executorParam", param);
+  public void addRecordEndQueue(UsageRecordAddReqDto params) {
+    // 计算套餐过期时间（单位：毫秒）
 
-    // String url = XXL_JOB_ADMIN_URL + "/jobinfo/add";
-    // restTemplate.postForObject(url, request, String.class);
+    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime expirationTime = now.plusMonths(params.getMonth());
+    long ttl = Duration.between(now, expirationTime).toMillis();
+    // 发送消息到普通队列，设置 TTL
+    UsageRecordExpire dto = UsageRecordExpire.builder()
+        .type("expire")
+        .userId(params.getUserId())
+        .packageId(params.getPackageId())
+        .build();
+    this.rabbitTemplate.convertAndSend(
+        RabbitMQConstants.USAGERECORD_QUEUE,
+        dto,
+        message -> {
+          MessageProperties properties = message.getMessageProperties();
+          properties.setDeliveryMode(MessageDeliveryMode.PERSISTENT); // 设置消息持久化
+          properties.setExpiration(String.valueOf(ttl)); // 设置 TTL
+          return message;
+        });
+
+    log.info("使用记录添加进MQ队列 " + dto + "，过期时间: " + ttl + " 毫秒后");
   }
 
-  @XxlJob("usageRecordJobHandler")
-  public void usageRecordJobHandler() throws Exception {
+  @RabbitListener(queues = RabbitMQConstants.USER_PACKAGE_DEAD_LETTER_QUEUE)
+  public void handleExpiredPackage(UsageRecordExpire dto) {
+    try {
+      log.info("处理使用记录过期逻辑: " + dto);
+      UsageRecord record = usageRecordMapper.selectOne(
+          new LambdaQueryWrapper<UsageRecord>()
+              .eq(UsageRecord::getUserId, dto.getUserId())
+              .eq(UsageRecord::getPackageId, dto.getPackageId())
+              .last("LIMIT 1"));
+      record.setPurchaseStatus(3);
+      usageRecordMapper.updateById(record);
 
-    // if (targetDateStr == null || targetDateStr.isEmpty()) {
-    // XxlJobHelper.log("任务参数为空，请检查");
-    // return;
-    // }
-
-    // // 解析目标日期
-    // LocalDate targetDate = LocalDate.parse(targetDateStr,
-    // DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-    // LocalDate currentDate = LocalDate.now();
-
-    // // 判断当前时间是否达到目标时间
-    // if (currentDate.isBefore(targetDate)) {
-    // XxlJobHelper.log("任务未到执行时间，跳过");
-    // return;
-    // }
-
-    // // 执行任务逻辑
-    // XxlJobHelper.log("任务开始执行，目标时间：" + targetDate);
-    // // TODO: 添加你的业务逻辑
-    // XxlJobHelper.log("任务执行完成");
+    } catch (Exception e) {
+      log.error("处理使用记录过期逻辑失败", e);
+    }
   }
 
 }

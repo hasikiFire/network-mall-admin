@@ -216,6 +216,7 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
       usageRecordAddReqDto.setDeviceLimit(reqDto.getDeviceLimit());
       usageRecordAddReqDto.setDataAllowance(reqDto.getDataAllowance());
       usageRecordAddReqDto.setSpeedLimit(packageItem.getSpeedLimit());
+      usageRecordAddReqDto.setMonth(reqDto.getMonth());
 
       usageRecordService.createRecord(usageRecordAddReqDto);
       // TODO 应该订单支付链接，支付完成才生成使用记录
