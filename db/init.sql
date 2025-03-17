@@ -42,7 +42,7 @@ CREATE TABLE `package_item` (
   `speed_limit` bigint unsigned DEFAULT NULL COMMENT '流量速率限额（单位：B）',
   `deleted` tinyint DEFAULT '0' COMMENT '是否已删除 1：已删除 0：未删除',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -79,7 +79,7 @@ CREATE TABLE pay_order (
   refund_status varchar(16) COMMENT '退款状态，refunding(退款中)、part_refunded(部分退款)、all_refunded(全部退款)、rejected(已拒绝',
   `deleted` tinyint(2) DEFAULT '0' COMMENT '是否已删除 1：已删除 0：未删除',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (id),
   KEY `order_code` (`order_code`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT '订单表';
@@ -115,7 +115,7 @@ CREATE TABLE `pay_order_item` (
   `speed_limit` bigint unsigned DEFAULT NULL COMMENT '流量速率限额（单位：B）',
   `deleted` tinyint DEFAULT '0' COMMENT '是否已删除 1：已删除 0：未删除',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '订单项表';
 
@@ -134,8 +134,9 @@ CREATE TABLE `usage_record` (
   `speed_limit` bigint unsigned DEFAULT NULL COMMENT '流量速率限额（单位：B）',
   `device_num` int DEFAULT NULL COMMENT '在线设备数量',
   `device_limit` int DEFAULT NULL COMMENT '在线设备数量限额',
+  `next_reset_date` timestamp NULL DEFAULT NULL COMMENT '下次流量重置日期',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` tinyint DEFAULT '0' COMMENT '是否已删除 1：已删除 0：未删除',
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
@@ -162,7 +163,7 @@ CREATE TABLE `foreign_server` (
   `is_beyond_transfer` tinyint DEFAULT NULL COMMENT '是否超过默认流量包限额(1：是，0：否)',
   `deleted` tinyint(1) DEFAULT '0' COMMENT '是否已删除 1：已删除 0：未删除',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -186,7 +187,7 @@ CREATE TABLE promotion_links (
   registration_time INT NOT NULL DEFAULT 0 COMMENT '注册成功次数',
   purchase_time INT NOT NULL DEFAULT 0 COMMENT '购买次数',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '推广链接表';
 
@@ -218,6 +219,8 @@ CREATE TABLE `config` (
   `is_public` tinyint(1) unsigned NOT NULL DEFAULT 0 COMMENT '是否为公共参数',
   `type` varchar(16) NOT NULL DEFAULT '' COMMENT '配置值类型',
   `mark` varchar(255) NOT NULL DEFAULT '' COMMENT '备注',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
   KEY `item` (`item`),
   KEY `class` (`class`),
@@ -228,6 +231,8 @@ CREATE TABLE `link` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '记录ID',
   `token` varchar(255) NOT NULL DEFAULT '' COMMENT '订阅token',
   `user_id` bigint(20) unsigned NOT NULL DEFAULT 0 COMMENT '用户ID',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `token` (`token`),
   UNIQUE KEY `user_id` (`user_id`)

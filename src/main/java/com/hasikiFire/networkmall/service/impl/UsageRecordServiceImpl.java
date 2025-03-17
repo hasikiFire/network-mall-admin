@@ -3,16 +3,11 @@ package com.hasikiFire.networkmall.service.impl;
 import com.hasikiFire.networkmall.core.RabbitMQ.UsageRecordExpire;
 import com.hasikiFire.networkmall.core.common.constant.RabbitMQConstants;
 import com.hasikiFire.networkmall.core.common.exception.BusinessException;
-import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.dao.entity.UsageRecord;
 import com.hasikiFire.networkmall.dao.mapper.UsageRecordMapper;
-import com.hasikiFire.networkmall.dto.req.PackageEditReqDto;
-import com.hasikiFire.networkmall.dto.req.PackageListReqDto;
 import com.hasikiFire.networkmall.dto.req.UsageRecordAddReqDto;
 import com.hasikiFire.networkmall.dto.req.UsageRecordEditReqDto;
-import com.hasikiFire.networkmall.dto.resp.PackageListRespDto;
-import com.hasikiFire.networkmall.dto.resp.PackageRespDto;
 import com.hasikiFire.networkmall.service.UsageRecordService;
 import cn.dev33.satoken.stp.StpUtil;
 import jakarta.validation.Valid;
@@ -20,21 +15,20 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import java.util.List;
+
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>
@@ -181,6 +175,37 @@ public class UsageRecordServiceImpl extends ServiceImpl<UsageRecordMapper, Usage
     } catch (Exception e) {
       log.error("处理使用记录过期逻辑失败", e);
     }
+  }
+
+  @Transactional
+  public void batchResetDataUsage(List<UsageRecord> records) {
+    LocalDate nowDate = LocalDate.now(); // 当前日期（忽略时间）
+
+    for (UsageRecord record : records) {
+      // 重置流量字段
+      record.setConsumedDataTransfer(0L);
+      record.setConsumedDataDownload(0L);
+      record.setConsumedDataUpload(0L);
+
+      // 更新下次重置时间（当前时间 +30天）
+      LocalDateTime nextReset = nowDate.plusDays(30).atStartOfDay();
+      record.setNextResetDate(nextReset);
+    }
+
+    this.updateBatchById(records); // 批量更新
+  }
+
+  public List<UsageRecord> findRecordsDueForReset(int page, int size) {
+    // 创建分页对象
+    Page<UsageRecord> pageInfo = new Page<>(page, size);
+
+    // 构建查询条件
+    LambdaQueryWrapper<UsageRecord> queryWrapper = new LambdaQueryWrapper<UsageRecord>()
+        .apply("DATE(next_reset_date) = CURDATE()") // 日期比较
+        .eq(UsageRecord::getPurchaseStatus, 1)
+        .orderByDesc(UsageRecord::getId);
+    return usageRecordMapper.selectPage(pageInfo, queryWrapper).getRecords();
+
   }
 
 }

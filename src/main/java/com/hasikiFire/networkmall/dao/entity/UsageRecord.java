@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author ${author}
- * @since 2025/01/09
+ * @since 2025/03/17
  */
 @TableName("usage_record")
 public class UsageRecord implements Serializable {
@@ -89,6 +89,11 @@ public class UsageRecord implements Serializable {
      * 在线设备数量限额
      */
     private Integer deviceLimit;
+
+    /**
+     * 下次流量重置日期
+     */
+    private LocalDateTime nextResetDate;
 
     /**
      * 创建时间
@@ -218,6 +223,14 @@ public class UsageRecord implements Serializable {
         this.deviceLimit = deviceLimit;
     }
 
+    public LocalDateTime getNextResetDate() {
+        return nextResetDate;
+    }
+
+    public void setNextResetDate(LocalDateTime nextResetDate) {
+        this.nextResetDate = nextResetDate;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -259,6 +272,7 @@ public class UsageRecord implements Serializable {
         ", speedLimit=" + speedLimit +
         ", deviceNum=" + deviceNum +
         ", deviceLimit=" + deviceLimit +
+        ", nextResetDate=" + nextResetDate +
         ", createdAt=" + createdAt +
         ", updatedAt=" + updatedAt +
         ", deleted=" + deleted +

@@ -6,6 +6,8 @@ import com.hasikiFire.networkmall.dto.req.UsageRecordAddReqDto;
 import com.hasikiFire.networkmall.dto.req.UsageRecordEditReqDto;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -13,7 +15,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * 用户已购套餐记录表 服务类
  * </p>
  *
- * @author ${hasikiFire}
+ * @author
  * @since 2024/06/23
  */
 public interface UsageRecordService extends IService<UsageRecord> {
@@ -22,4 +24,8 @@ public interface UsageRecordService extends IService<UsageRecord> {
   RestResp<UsageRecord> updateRecord(@Valid UsageRecordEditReqDto params);
 
   UsageRecord createRecord(@Valid UsageRecordAddReqDto params);
+
+  List<UsageRecord> findRecordsDueForReset(int page, int batchSize);
+
+  void batchResetDataUsage(List<UsageRecord> records);
 }
