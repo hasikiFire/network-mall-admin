@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hasikiFire.networkmall.core.common.req.PageReqDto;
 import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
+import com.hasikiFire.networkmall.core.payment.PayResponse;
 import com.hasikiFire.networkmall.dto.req.PackageAddReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageBuyReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageEditReqDto;
@@ -50,7 +51,7 @@ public class PackageController {
   @SaCheckLogin
   @Operation(summary = "购买套餐")
   @PostMapping("/buy")
-  public RestResp<PackageRespDto> buyPackage(@Valid @RequestBody PackageBuyReqDto params) {
+  public RestResp<PayResponse> buyPackage(@Valid @RequestBody PackageBuyReqDto params) {
     return packageService.buyPackage(params);
   }
 }

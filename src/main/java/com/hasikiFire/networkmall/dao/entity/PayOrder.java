@@ -34,13 +34,13 @@ public class PayOrder implements Serializable {
     /**
      * 订单号
      */
-    @Schema(description = "订单号", example = "ORD123456789")
+    @Schema(description = "订单号", example = "202503181901968682322628608")
     private String orderCode;
 
     /**
      * 外部支付系统交易号
      */
-    @Schema(description = "外部支付系统交易号", example = "TRADE123456789")
+    @Schema(description = "外部支付系统交易号", example = "202503181901968682322628608")
     private String tradeNo;
 
     /**

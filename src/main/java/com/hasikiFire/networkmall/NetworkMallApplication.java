@@ -6,6 +6,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -14,9 +15,11 @@ import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 
 @MapperScan("com.hasikiFire.networkmall.dao.mapper")
+@MapperScan("com.hasikiFire.networkmall.dao.core")
 @SpringBootApplication
 @EnableTransactionManagement
 @EnableScheduling
+@EnableAsync
 public class NetworkMallApplication {
 
 	public static void main(String[] args) {

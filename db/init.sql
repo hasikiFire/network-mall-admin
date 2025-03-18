@@ -66,7 +66,7 @@ CREATE TABLE pay_order (
   pay_amount decimal(10, 2) NOT NULL DEFAULT '0.00' COMMENT '支付金额',
   pay_time timestamp COMMENT '支付时间',
   pay_way varchar(32) COMMENT '支付方式: wxpay(微信支付)、alipay支付宝支付),USTD(加密货币交易)',
-  pay_seene varchar(32) COMMENT 'ONLINE_PAY(在线支付)、QRCODE_SCAN_PAY（扫码支), QRCODE_SHOW_PAY(付款码支付)',
+  pay_seene varchar(32) COMMENT 'ONLINE_PAY(在线支付)、QRCODE_SCAN_PAY（扫码支付), QRCODE_SHOW_PAY(付款码支付)',
   pay_status varchar(16) DEFAULT 'waiting' COMMENT '支付状态， waiting(待支付)、success(支付成功)，failed(支付失败)',
   `coupon_code` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '优惠券编码',
   `coupon_amount` decimal(10, 2) DEFAULT NULL COMMENT '已优惠金额',
@@ -81,7 +81,7 @@ CREATE TABLE pay_order (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (id),
-  KEY `order_code` (`order_code`)
+  UNIQUE  KEY `order_code` (`order_code`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT '订单表';
 
 CREATE TABLE `pay_order_refund` (

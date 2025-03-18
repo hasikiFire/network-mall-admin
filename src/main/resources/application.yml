@@ -3,7 +3,7 @@ spring:
     # 应用名
     name: network-mall
   profiles:
-    active: prod
+    active: test
 
   data:
     # Redis 配置
@@ -33,7 +33,7 @@ spring:
   # RabbitMQ 配置
   rabbitmq:
     host: test.com # RabbitMQ 服务器地址
-    port: 12345 # RabbitMQ 端口 
+    port: 12345 # RabbitMQ 端口
     username: 123 # RabbitMQ 用户名
     password: 123456 # RabbitMQ 密码
     virtual-host: / # 虚拟主机，默认是 "/"
@@ -47,8 +47,21 @@ spring:
           enabled: true # 是否启用重试机制
           max-attempts: 6 # 最大重试次数
           initial-interval: 1000 # 重试间隔时间（单位：毫秒）
----
+  task:
+    execution:
+      pool:
+        core-size: 5
+        max-size: 20
+        queue-capacity: 100
+payment:
+  alipay:
+    app-id: wx1234567890
+    alipay-public-key: 1230000109
+    private-key: your-api-key
+    server-url: https://openapi.alipay.com/gateway.do
+    notify-url: https://test.com/alipay/notify
 
+---
 
 ---
 #---------------------自定义配置----------------------------
@@ -84,7 +97,6 @@ network:
       # - /system/notice/*
 
 ---
-
 #--------------------接口文档配置---------------------------
 springdoc:
   api-docs:
@@ -92,4 +104,4 @@ springdoc:
 
 cors:
   allowedOrigins:
-  - "http://localhost"
+    - "http://localhost"

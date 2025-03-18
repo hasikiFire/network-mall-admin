@@ -20,6 +20,7 @@ public class DataResetScheduler {
 
     private static final int BATCH_SIZE = 1000; // 每批处理1000条
 
+    // TODO 改成多线程任务
     @Scheduled(cron = "0 0 * * * ?") // 每小时0分0秒执行（每天24次）
     public void resetDataUsage() {
         int page = 0;

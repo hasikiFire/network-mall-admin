@@ -3,6 +3,7 @@ package com.hasikiFire.networkmall.service;
 import com.hasikiFire.networkmall.core.common.req.PageReqDto;
 import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
+import com.hasikiFire.networkmall.core.payment.PayResponse;
 import com.hasikiFire.networkmall.dao.entity.PackageItem;
 import com.hasikiFire.networkmall.dto.req.PackageAddReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageBuyReqDto;
@@ -31,6 +32,6 @@ public interface PackageService extends IService<PackageItem> {
 
   RestResp<Void> editPackage(PackageEditReqDto params);
 
-  RestResp<PackageRespDto> buyPackage(PackageBuyReqDto params);
+  RestResp<PayResponse> buyPackage(PackageBuyReqDto params);
 
 }

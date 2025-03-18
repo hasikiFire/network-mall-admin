@@ -3,17 +3,19 @@ package com.hasikiFire.networkmall.service.impl;
 import com.hasikiFire.networkmall.core.common.enums.OrderStatus;
 import com.hasikiFire.networkmall.core.common.exception.BusinessException;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
-import com.hasikiFire.networkmall.dao.entity.Config;
+import com.hasikiFire.networkmall.core.payment.AlipayStrategy;
+import com.hasikiFire.networkmall.core.payment.PayResponse;
+import com.hasikiFire.networkmall.core.payment.PaymentType;
 import com.hasikiFire.networkmall.dao.entity.PackageItem;
 import com.hasikiFire.networkmall.dao.entity.PayOrder;
 import com.hasikiFire.networkmall.dao.entity.PayOrderItem;
 import com.hasikiFire.networkmall.dao.entity.UserCoupon;
-import com.hasikiFire.networkmall.dao.mapper.PayOrderItemMapper;
 import com.hasikiFire.networkmall.dao.mapper.PayOrderMapper;
 import com.hasikiFire.networkmall.dao.mapper.UserCouponMapper;
 import com.hasikiFire.networkmall.dto.req.CancelOrderReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageBuyReqDto;
 import com.hasikiFire.networkmall.dto.req.UsageRecordAddReqDto;
+import com.hasikiFire.networkmall.dto.resp.PollOrdersRespDto;
 import com.hasikiFire.networkmall.service.ConfigService;
 import com.hasikiFire.networkmall.service.PayOrderItemService;
 import com.hasikiFire.networkmall.service.PayOrderService;
@@ -35,14 +37,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * <p>
@@ -62,6 +61,8 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
   private final UserCouponMapper userCouponMapper;
   private final UsageRecordService usageRecordService;
   private final PayOrderItemService payOrderItemService;
+
+  private final AlipayStrategy alipayStrategy;
 
   @Override
   public PayOrder createOrder(PackageItem packageItem, PackageBuyReqDto reqDto) {
@@ -191,50 +192,76 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
   }
 
   @Override
-  public Boolean payOrder(String orderId) {
-
-    return true;
+  public PayResponse payOrder(PayOrder order, PackageItem packageItem) {
+    PaymentType paymentType = PaymentType.fromCode(order.getPayWay());
+    if (paymentType == null) {
+      throw new BusinessException("不支持的支付方式: " + order.getPayWay());
+    }
+    if (paymentType == PaymentType.ALIPAY) {
+      return alipayStrategy.pay(order, packageItem);
+    }
+    return alipayStrategy.pay(order, packageItem);
   }
 
   @Transactional
-  public void pollOrders(String orderCode) {
-    // 查询所有支付中的订单
-    PayOrder payOrder = payOrderMapper.selectOne(new LambdaQueryWrapper<PayOrder>()
-        .eq(PayOrder::getOrderCode, orderCode)
-        .eq(PayOrder::getOrderStatus, OrderStatus.PAID));
+  public RestResp<PollOrdersRespDto> pollOrders(String orderCode) {
 
+    PayOrder payOrder = payOrderMapper.selectOne(new LambdaQueryWrapper<PayOrder>()
+        .eq(PayOrder::getOrderCode, orderCode));
+    if (payOrder == null) {
+      log.warn("订单不存在: {}", orderCode);
+      return RestResp.fail("订单不存在");
+    }
+
+    PaymentType paymentType = PaymentType.fromCode(payOrder.getPayWay());
+    if (paymentType == PaymentType.ALIPAY) {
+      PollOrdersRespDto response = alipayStrategy.queryStatus(orderCode);
+      if (response.getStatus().equals("1")) {
+        payOrder.setOrderStatus(OrderStatus.PAID);
+        payOrderMapper.updateById(payOrder);
+        this.paySuccess(payOrder);
+      }
+
+      return RestResp.ok(PollOrdersRespDto.builder()
+          .orderCode(orderCode)
+          .status(response.getStatus())
+          .build());
+    }
+
+    return RestResp.ok(PollOrdersRespDto.builder()
+        .orderCode(orderCode)
+        .status("0")
+        .build());
+  }
+
+  @Async
+  @Transactional(propagation = Propagation.REQUIRES_NEW) // 开启新事务
+  private void paySuccess(PayOrder payOrder) {
     try {
-      // TODO 模拟调用支付服务查询订单状态
-      // boolean isPaymentSuccess =
-      // this.checkPaymentStatus(payingOrder.getOrderCode());
-      boolean isPaymentSuccess = true;
       PayOrderItem payOrderItem = payOrderItemService.getOrderItemByOrderCode(payOrder.getOrderCode()).getData();
       if (payOrderItem == null) {
         throw new BusinessException("订单项不存在");
       }
 
-      if (isPaymentSuccess) {
-        LocalDateTime nowTime = LocalDateTime.now();
-        // 支付成功，生成使用记录
-        UsageRecordAddReqDto usageRecordAddReqDto = new UsageRecordAddReqDto();
-        usageRecordAddReqDto.setOrderCode(payOrder.getOrderCode());
-        usageRecordAddReqDto.setUserId(payOrder.getUserId());
-        usageRecordAddReqDto.setPackageId(payOrder.getPackageId());
-        usageRecordAddReqDto.setPurchaseStartTime(nowTime);
-        usageRecordAddReqDto.setPurchaseEndTime(nowTime.plusMonths(payOrderItem.getPackageUnit()));
-        usageRecordAddReqDto.setDeviceLimit(payOrderItem.getDeviceLimit());
-        usageRecordAddReqDto.setDataAllowance(payOrderItem.getDataAllowance());
-        usageRecordAddReqDto.setSpeedLimit(payOrderItem.getSpeedLimit());
+      LocalDateTime nowTime = LocalDateTime.now();
+      // 支付成功，生成使用记录
+      UsageRecordAddReqDto usageRecordAddReqDto = new UsageRecordAddReqDto();
+      usageRecordAddReqDto.setOrderCode(payOrder.getOrderCode());
+      usageRecordAddReqDto.setUserId(payOrder.getUserId());
+      usageRecordAddReqDto.setPackageId(payOrder.getPackageId());
+      usageRecordAddReqDto.setPurchaseStartTime(nowTime);
+      usageRecordAddReqDto.setPurchaseEndTime(nowTime.plusMonths(payOrderItem.getPackageUnit()));
+      usageRecordAddReqDto.setDeviceLimit(payOrderItem.getDeviceLimit());
+      usageRecordAddReqDto.setDataAllowance(payOrderItem.getDataAllowance());
+      usageRecordAddReqDto.setSpeedLimit(payOrderItem.getSpeedLimit());
+      usageRecordAddReqDto.setMonth(payOrderItem.getPackageUnit());
+      usageRecordService.createRecord(usageRecordAddReqDto);
+      // return RestResp.ok(PackageRespDto.builder().payOrder(payOrder).build());
 
-        // 更新订单状态为成功
-        payOrder.setOrderStatus(OrderStatus.PAID);
-        payOrderMapper.updateById(payOrder);
-      }
     } catch (Exception e) {
       // 记录异常日志
       log.error("轮询订单状态失败，订单号: {}", payOrder.getOrderCode(), e);
     }
-
   }
 
   @Override

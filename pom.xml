@@ -19,7 +19,7 @@
 		<java.version>17</java.version>
 		<mybatis-plus.version>3.5.5</mybatis-plus.version>
 		<mybatis-plus-generator.version>3.5.1</mybatis-plus-generator.version>
-		<jjwt.version>0.11.5</jjwt.version> 
+		<jjwt.version>0.11.5</jjwt.version>
 		<redisson.version>3.19.1</redisson.version>
 		<spring-boot-admin.version>3.0.0</spring-boot-admin.version>
 		<springdoc-openapi.version>2.5.0</springdoc-openapi.version>
@@ -144,7 +144,13 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-amqp</artifactId>
-				<version>${amqp-client.version}</version>
+			<version>${amqp-client.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.alipay.sdk</groupId>
+			<artifactId>alipay-sdk-java</artifactId>
+			<version>4.40.82.ALL</version>
 		</dependency>
 
 		<!-- XXL-JOB 相关 -->

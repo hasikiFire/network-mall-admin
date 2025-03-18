@@ -4,6 +4,8 @@ import com.hasikiFire.networkmall.core.common.exception.BusinessException;
 import com.hasikiFire.networkmall.core.common.req.PageReqDto;
 import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
+import com.hasikiFire.networkmall.core.payment.PayResponse;
+import com.hasikiFire.networkmall.core.payment.PaymentStrategy;
 import com.hasikiFire.networkmall.dao.entity.PackageItem;
 import com.hasikiFire.networkmall.dao.entity.PayOrder;
 import com.hasikiFire.networkmall.dao.entity.UsageRecord;
@@ -59,6 +61,7 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
   private final PayOrderItemService payOrderItemService;
   private final UsageRecordService usageRecordService;
   private final UsageRecordMapper usageRecordMapper;
+
   // private final RateLimiter rateLimiter;
 
   @Override
@@ -161,7 +164,7 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
 
   @Override
   @Transactional
-  public RestResp<PackageRespDto> buyPackage(@Valid PackageBuyReqDto reqDto) {
+  public RestResp<PayResponse> buyPackage(@Valid PackageBuyReqDto reqDto) {
 
     // if (!rateLimiter.isAllowed(reqDto.getUserId(), "buyPackage")) {
     // throw new IllegalStateException("操作太频繁，请稍后再试。");
@@ -201,30 +204,13 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
       // 订单快照信息
       payOrderItemService.createOrderItem(packageItem, payOrder);
 
-      // TODO: 调用支付服务获取支付链接
-      payOrderService.payOrder(payOrder.getOrderCode());
-      //
-      // TODO 假设订单支付成功生成使用记录，订单需要更新状态
-      // 查询是否有旧的未过期的套餐，有则更新结束时间，没有则新增
-
-      UsageRecordAddReqDto usageRecordAddReqDto = new UsageRecordAddReqDto();
-      usageRecordAddReqDto.setOrderCode(payOrder.getOrderCode());
-      usageRecordAddReqDto.setUserId(reqDto.getUserId());
-      usageRecordAddReqDto.setPackageId(reqDto.getPackageId());
-      usageRecordAddReqDto.setPurchaseStartTime(LocalDateTime.now());
-      usageRecordAddReqDto.setPurchaseEndTime(LocalDateTime.now().plusMonths(reqDto.getMonth()));
-      usageRecordAddReqDto.setDeviceLimit(reqDto.getDeviceLimit());
-      usageRecordAddReqDto.setDataAllowance(reqDto.getDataAllowance());
-      usageRecordAddReqDto.setSpeedLimit(packageItem.getSpeedLimit());
-      usageRecordAddReqDto.setMonth(reqDto.getMonth());
-
-      usageRecordService.createRecord(usageRecordAddReqDto);
-      // TODO 应该订单支付链接，支付完成才生成使用记录
-      return RestResp.ok(PackageRespDto.builder().payOrder(payOrder).build());
+      PayResponse response = payOrderService.payOrder(payOrder, packageItem);
+      return RestResp.ok(response);
     } catch (Exception e) {
       // 异常处理
-      throw new BusinessException("购买套餐失败：" + e.getMessage());
+      throw new BusinessException("生成支付订单失败：" + e.getMessage());
     }
+
   }
 
   @Override

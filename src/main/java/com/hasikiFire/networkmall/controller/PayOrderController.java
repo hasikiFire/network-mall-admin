@@ -16,7 +16,9 @@ import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.dao.entity.PayOrder;
 import com.hasikiFire.networkmall.dto.req.CancelOrderReqDto;
+import com.hasikiFire.networkmall.dto.req.QueryOrderReqDto;
 import com.hasikiFire.networkmall.dto.req.UsersendEmailCodeDto;
+import com.hasikiFire.networkmall.dto.resp.PollOrdersRespDto;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -46,5 +48,11 @@ public class PayOrderController {
   @PostMapping("/cancel")
   public RestResp<Boolean> cancelOrder(@Valid @RequestBody CancelOrderReqDto reqDto) {
     return payOrderService.cancelOrder(reqDto);
+  }
+
+  @Operation(summary = "轮询订单")
+  @GetMapping("/pollOrders/{id}")
+  public RestResp<PollOrdersRespDto> pollOrders(@PathVariable String id) {
+    return payOrderService.pollOrders(id);
   }
 }
