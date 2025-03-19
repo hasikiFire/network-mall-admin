@@ -35,11 +35,11 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/payOrder")
 @RequiredArgsConstructor
+@SaCheckLogin
 public class PayOrderController {
 
   private final PayOrderService payOrderService;
 
-  @SaCheckLogin
   @GetMapping("/list")
   public RestResp<List<PayOrder>> getOrderList() {
     return payOrderService.getOrderList();
