@@ -4,6 +4,7 @@ import com.hasikiFire.networkmall.core.common.enums.OrderStatus;
 import com.hasikiFire.networkmall.core.common.exception.BusinessException;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.core.payment.AlipayStrategy;
+import com.hasikiFire.networkmall.core.payment.PayQrcode;
 import com.hasikiFire.networkmall.core.payment.PayResponse;
 import com.hasikiFire.networkmall.core.payment.PaymentType;
 import com.hasikiFire.networkmall.dao.entity.PackageItem;
@@ -33,6 +34,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import cn.dev33.satoken.stp.StpUtil;
 
 import com.alibaba.fastjson.JSONObject;
@@ -79,8 +83,8 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     payOrder.setPayWay(reqDto.getPayWay());
     if (reqDto.getPayWay().equals("alipay")) {
       payOrder.setPaySeene("QR_CODE_OFFLINE");
-      // 预下单请求生成的二维码有效时间为2小时
-      payOrder.setOrderExpireTime(LocalDateTime.now().plusHours(2));
+      // 预下单请求生成的二维码有效时间为2小时，这里设置成1小时
+      payOrder.setOrderExpireTime(LocalDateTime.now().plusHours(1));
     }
 
     BigDecimal orderAmount = calculateOrderAmount(packageItem, reqDto);
@@ -143,13 +147,12 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
   }
 
   private BigDecimal calculatePayAmount(PackageItem packageItem, PackageBuyReqDto reqDto, BigDecimal orderAmount) {
-    if (reqDto.getCouponCode() == null) {
+    if (reqDto.getCouponCode() == null || reqDto.getCouponCode().isEmpty()) {
       return orderAmount;
     }
 
     try {
 
-      // 获取优惠券
       RestResp<UserCoupon> couponResp = userCouponService.getCouponByCode(reqDto.getCouponCode());
       if (couponResp == null || couponResp.getData() == null) {
         log.warn("优惠券不存在: {}", reqDto.getCouponCode());
@@ -208,10 +211,24 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     if (paymentType == null) {
       throw new BusinessException("不支持的支付方式: " + order.getPayWay());
     }
+    PayResponse payResponse = null;
+    ObjectMapper mapper = new ObjectMapper();
+    String json = null;
+
     if (paymentType == PaymentType.ALIPAY) {
-      return alipayStrategy.pay(order, packageItem);
+      payResponse = alipayStrategy.pay(order, packageItem);
     }
-    return alipayStrategy.pay(order, packageItem);
+    if (payResponse.getPayUrl() != null) {
+      try {
+        json = mapper.writeValueAsString(PayQrcode.builder().qrcode(payResponse.getPayUrl()).build());
+        order.setPayQrCodes(json);
+        payOrderMapper.updateById(order);
+      } catch (JsonProcessingException e) {
+        log.error("[PayOrderServiceImpl payOrder] 支付宝下单成功响应转换json失败: {}", e.getMessage());
+      }
+    }
+
+    return payResponse;
   }
 
   @Transactional
@@ -389,5 +406,19 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
       return RestResp.ok(false);
     }
 
+  }
+
+  @Override
+  public PayOrder checkExistPayOrder(PackageBuyReqDto packageItem) {
+
+    PayOrder payOrder = payOrderMapper.selectOne(new LambdaQueryWrapper<PayOrder>()
+        .eq(PayOrder::getPackageId, packageItem.getPackageId())
+        .eq(PayOrder::getUserId, packageItem.getUserId())
+        .eq(PayOrder::getPackageUnit, packageItem.getMonth())
+        .eq(PayOrder::getCouponCode, packageItem.getCouponCode()));
+    if (payOrder != null && payOrder.getOrderExpireTime().isAfter(LocalDateTime.now())) {
+      return payOrder;
+    }
+    return null;
   }
 }

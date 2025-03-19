@@ -10,8 +10,8 @@ public class PayResponse {
   // 通用支付信息
   private String orderNo; // 商户订单号
   private BigDecimal amount; // 支付金额
-  private String paymentType; // 支付类型（ALIPAY/WECHAT...）
-  private String status;
+  private String paymentType; // 支付类型
+  private String status; // 支付状态 1 成功
   private String payUrl; // 支付链接
   /**
    * 渠道返回的原始数据

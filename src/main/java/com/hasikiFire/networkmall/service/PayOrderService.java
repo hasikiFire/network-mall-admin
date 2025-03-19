@@ -70,4 +70,6 @@ public interface PayOrderService extends IService<PayOrder> {
   RestResp<List<PayOrder>> getOrderList();
 
   RestResp<Boolean> refundOrder(RefundOrderReqDto reqDto);
+
+  PayOrder checkExistPayOrder(PackageBuyReqDto packageItem);
 }

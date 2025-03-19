@@ -75,7 +75,7 @@ public class AlipayStrategy implements PaymentStrategy {
       model.setTotalAmount(String.valueOf(order.getOrderAmount()));
 
       // 设置订单标题
-      model.setSubject(String.valueOf(packageItem.getSalePrice()) + "元套餐");
+      model.setSubject(String.valueOf(order.getOrderAmount()) + "元套餐");
 
       // 设置产品码 商家和支付宝签约的产品码。 订单码支付传：QR_CODE_OFFLINE。
       model.setProductCode("QR_CODE_OFFLINE");
@@ -91,8 +91,8 @@ public class AlipayStrategy implements PaymentStrategy {
         return PayResponse.builder()
             .orderNo(order.getOrderCode())
             .amount(order.getOrderAmount())
-            .paymentType("ALIPAY")
-            .status("SUCCESS")
+            .paymentType(order.getPayWay())
+            .status("1")
             .payUrl(response.getQrCode())
             // .data(response.getBody())
             .build();

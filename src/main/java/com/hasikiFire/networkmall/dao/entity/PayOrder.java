@@ -17,11 +17,12 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author ${author}
- * @since 2025/01/08
+ * @since 2025/03/19
  */
 @Schema(description = "订单表")
 @TableName("pay_order")
 public class PayOrder implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     /**
@@ -189,6 +190,11 @@ public class PayOrder implements Serializable {
      */
     @Schema(description = "更新时间", example = "2025-01-08T10:00:00")
     private LocalDateTime updatedAt;
+
+    /**
+     * 支付二维码信息（JSON格式）
+     */
+    private String payQrCodes;
 
     public Long getId() {
         return id;
@@ -406,6 +412,14 @@ public class PayOrder implements Serializable {
         this.updatedAt = updatedAt;
     }
 
+    public String getPayQrCodes() {
+        return payQrCodes;
+    }
+
+    public void setPayQrCodes(String payQrCodes) {
+        this.payQrCodes = payQrCodes;
+    }
+
     @Override
     public String toString() {
         return "PayOrder{" +
@@ -436,6 +450,7 @@ public class PayOrder implements Serializable {
                 ", deleted=" + deleted +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
+                ", payQrCodes=" + payQrCodes +
                 "}";
     }
 }

@@ -4,6 +4,7 @@ import com.hasikiFire.networkmall.core.common.exception.BusinessException;
 import com.hasikiFire.networkmall.core.common.req.PageReqDto;
 import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
+import com.hasikiFire.networkmall.core.payment.PayQrcode;
 import com.hasikiFire.networkmall.core.payment.PayResponse;
 import com.hasikiFire.networkmall.core.payment.PaymentStrategy;
 import com.hasikiFire.networkmall.dao.entity.PackageItem;
@@ -29,10 +30,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.alibaba.fastjson.JSON;
+import com.alipay.api.domain.Person;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -177,6 +182,7 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
     if (user == null) {
       throw new BusinessException("用户不存在");
     }
+
     if (reqDto.getDataAllowance() != null) {
       packageItem.setDataAllowance(reqDto.getDataAllowance());
     }
@@ -196,6 +202,27 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
       // 1. 已有已生效套餐：流量延长，时间延长
       // 2. 未有已生效套餐：新的直接生效
       return RestResp.error("您有未过期的套餐，请先使用完再购买");
+    }
+
+    PayOrder existPayOrder = payOrderService.checkExistPayOrder(reqDto);
+    if (existPayOrder != null && existPayOrder.getPayQrCodes() != null) {
+      
+      log.info("[buyPackage] 已有相同订单，返回上次订单二维码");
+      // return RestResp.error("您有未完成的订单，请先完成再购买");
+      ObjectMapper mapper = new ObjectMapper();
+      try {
+        PayQrcode payQrcode = mapper.readValue(existPayOrder.getPayQrCodes(), PayQrcode.class);
+        return RestResp.ok(PayResponse.builder()
+            .orderNo(existPayOrder.getOrderCode())
+            .amount(existPayOrder.getOrderAmount())
+            .paymentType(existPayOrder.getPayWay())
+            .status("1")
+            .payUrl(payQrcode.getQrcode())
+            .build());
+      } catch (JsonProcessingException e) {
+        log.error("[PayOrderServiceImpl payOrder] 支付宝下单成功响应转换json失败: {}", e.getMessage());
+        return RestResp.error("您有未完成的订单，请先完成再购买");
+      }
     }
 
     try {
