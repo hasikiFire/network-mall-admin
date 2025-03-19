@@ -81,7 +81,7 @@ CREATE TABLE pay_order (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (id),
-  UNIQUE  KEY `order_code` (`order_code`)
+  UNIQUE KEY `order_code`
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT '订单表';
 
 CREATE TABLE `pay_order_refund` (
@@ -124,7 +124,7 @@ CREATE TABLE `usage_record` (
   `package_id` bigint NOT NULL COMMENT '套餐计划主键',
   `order_code` varchar(50) NOT NULL COMMENT '订单号',
   `user_id` bigint NOT NULL COMMENT '用户ID',
-  `purchase_status` tinyint NOT NULL DEFAULT '0' COMMENT '套餐状态 0:未开始 1：生效中 2：流量已用尽 3：已过期 ',
+  `purchase_status` tinyint NOT NULL DEFAULT '0' COMMENT '套餐状态 0:未开始 1：生效中 2：流量已用尽 3：已过期 4. 已取消',
   `purchase_start_time` timestamp NOT NULL COMMENT '开始日期',
   `purchase_end_time` timestamp NOT NULL COMMENT '结束日期',
   `data_allowance` bigint unsigned NOT NULL COMMENT '数据流量限额（单位：B）',
@@ -138,7 +138,8 @@ CREATE TABLE `usage_record` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` tinyint DEFAULT '0' COMMENT '是否已删除 1：已删除 0：未删除',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `order_code`
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
 -- 订单相关-end 

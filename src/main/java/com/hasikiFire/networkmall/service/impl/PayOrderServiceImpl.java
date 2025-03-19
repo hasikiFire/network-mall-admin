@@ -256,9 +256,9 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
   private void paySuccess(PayOrder payOrder) {
     try {
 
-      UsageRecord orderItem = usageRecordMapper
+      UsageRecord usageRecord = usageRecordMapper
           .selectOne(new LambdaQueryWrapper<UsageRecord>().eq(UsageRecord::getOrderCode, payOrder.getOrderCode()));
-      if (orderItem != null) {
+      if (usageRecord != null) {
         log.warn("不能重复创建使用记录: {}", payOrder.getOrderCode());
         return;
       }
@@ -371,6 +371,10 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
               .atZone(ZoneId.systemDefault())
               .toLocalDateTime());
           payOrderMapper.updateById(payOrder);
+          UsageRecord usageRecord = usageRecordMapper
+              .selectOne(new LambdaQueryWrapper<UsageRecord>().eq(UsageRecord::getOrderCode, payOrder.getOrderCode()));
+          usageRecord.setPurchaseStatus(4);
+          usageRecordMapper.updateById(usageRecord);
           return RestResp.ok(true);
         }
         return RestResp.ok(false);

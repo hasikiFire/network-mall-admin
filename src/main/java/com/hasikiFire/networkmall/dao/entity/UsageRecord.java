@@ -41,7 +41,7 @@ public class UsageRecord implements Serializable {
     private Long userId;
 
     /**
-     * 套餐状态 0:未开始 1：生效中 2：流量已用尽 3：已过期 
+     * 套餐状态 0:未开始 1：生效中 2：流量已用尽 3：已过期 4. 已取消
      */
     private Integer purchaseStatus;
 
