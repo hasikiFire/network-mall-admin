@@ -6,6 +6,7 @@ import com.hasikiFire.networkmall.dao.entity.PackageItem;
 import com.hasikiFire.networkmall.dao.entity.PayOrder;
 import com.hasikiFire.networkmall.dto.req.CancelOrderReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageBuyReqDto;
+import com.hasikiFire.networkmall.dto.req.RefundOrderReqDto;
 import com.hasikiFire.networkmall.dto.resp.PollOrdersRespDto;
 import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
@@ -67,4 +68,6 @@ public interface PayOrderService extends IService<PayOrder> {
    * @return 订单列表
    */
   RestResp<List<PayOrder>> getOrderList();
+
+  RestResp<Boolean> refundOrder(RefundOrderReqDto reqDto);
 }

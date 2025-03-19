@@ -25,6 +25,11 @@ WORKDIR /app
 # 将构建的应用复制到新镜像
 COPY --from=builder /app/target/network-mall-admin.jar /app/app.jar
 
+RUN mkdir -p /app/logs
+
+# 添加持久化卷声明
+VOLUME /app/logs
+
 # 暴露应用程序端口
 EXPOSE 8080
 

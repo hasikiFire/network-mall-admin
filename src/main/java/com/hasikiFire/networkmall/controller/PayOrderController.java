@@ -17,6 +17,7 @@ import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.dao.entity.PayOrder;
 import com.hasikiFire.networkmall.dto.req.CancelOrderReqDto;
 import com.hasikiFire.networkmall.dto.req.QueryOrderReqDto;
+import com.hasikiFire.networkmall.dto.req.RefundOrderReqDto;
 import com.hasikiFire.networkmall.dto.req.UsersendEmailCodeDto;
 import com.hasikiFire.networkmall.dto.resp.PollOrdersRespDto;
 
@@ -48,6 +49,12 @@ public class PayOrderController {
   @PostMapping("/cancel")
   public RestResp<Boolean> cancelOrder(@Valid @RequestBody CancelOrderReqDto reqDto) {
     return payOrderService.cancelOrder(reqDto);
+  }
+
+  @Operation(summary = "申请退款")
+  @PostMapping("/refund")
+  public RestResp<Boolean> refundOrder(@Valid @RequestBody RefundOrderReqDto reqDto) {
+    return payOrderService.refundOrder(reqDto);
   }
 
   @Operation(summary = "轮询订单")

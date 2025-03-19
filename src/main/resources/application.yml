@@ -95,7 +95,6 @@ network:
     # 排除链接
     excludes:
       # - /system/notice/*
-
 ---
 #--------------------接口文档配置---------------------------
 springdoc:
@@ -105,3 +104,9 @@ springdoc:
 cors:
   allowedOrigins:
     - "http://localhost"
+
+logging:
+  level:
+    root: info   #主日志级别
+    # com.hasikiFire.networkmall: debug   #该项目日志级别，当需要打印sql时请开启为debug
+  path: ./logs

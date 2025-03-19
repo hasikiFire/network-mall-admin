@@ -9,13 +9,17 @@ import com.hasikiFire.networkmall.core.payment.PaymentType;
 import com.hasikiFire.networkmall.dao.entity.PackageItem;
 import com.hasikiFire.networkmall.dao.entity.PayOrder;
 import com.hasikiFire.networkmall.dao.entity.PayOrderItem;
+import com.hasikiFire.networkmall.dao.entity.UsageRecord;
 import com.hasikiFire.networkmall.dao.entity.UserCoupon;
 import com.hasikiFire.networkmall.dao.mapper.PayOrderMapper;
+import com.hasikiFire.networkmall.dao.mapper.UsageRecordMapper;
 import com.hasikiFire.networkmall.dao.mapper.UserCouponMapper;
 import com.hasikiFire.networkmall.dto.req.CancelOrderReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageBuyReqDto;
+import com.hasikiFire.networkmall.dto.req.RefundOrderReqDto;
 import com.hasikiFire.networkmall.dto.req.UsageRecordAddReqDto;
 import com.hasikiFire.networkmall.dto.resp.PollOrdersRespDto;
+import com.hasikiFire.networkmall.dto.resp.RefundOrderRespDto;
 import com.hasikiFire.networkmall.service.ConfigService;
 import com.hasikiFire.networkmall.service.PayOrderItemService;
 import com.hasikiFire.networkmall.service.PayOrderService;
@@ -37,6 +41,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -61,7 +66,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
   private final UserCouponMapper userCouponMapper;
   private final UsageRecordService usageRecordService;
   private final PayOrderItemService payOrderItemService;
-
+  private final UsageRecordMapper usageRecordMapper;
   private final AlipayStrategy alipayStrategy;
 
   @Override
@@ -72,6 +77,12 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     payOrder.setPackageUnit(reqDto.getMonth());
     payOrder.setOrderStatus(OrderStatus.WAIT_PAY);
     payOrder.setPayWay(reqDto.getPayWay());
+    if (reqDto.getPayWay().equals("alipay")) {
+      payOrder.setPaySeene("QR_CODE_OFFLINE");
+      // 预下单请求生成的二维码有效时间为2小时
+      payOrder.setOrderExpireTime(LocalDateTime.now().plusHours(2));
+    }
+
     BigDecimal orderAmount = calculateOrderAmount(packageItem, reqDto);
     payOrder.setOrderAmount(orderAmount);
     if (reqDto.getCouponCode() != null) {
@@ -217,7 +228,13 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     if (paymentType == PaymentType.ALIPAY) {
       PollOrdersRespDto response = alipayStrategy.queryStatus(orderCode);
       if (response.getStatus().equals("1")) {
+        payOrder.setPayStatus("success");
         payOrder.setOrderStatus(OrderStatus.PAID);
+        payOrder.setPayTime(response.getAlipayResp().getSendPayDate().toInstant()
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime());
+        payOrder.setTradeNo(response.getAlipayResp().getTradeNo());
+        payOrder.setPayAmount(new BigDecimal(response.getAlipayResp().getBuyerPayAmount()));
         payOrderMapper.updateById(payOrder);
         this.paySuccess(payOrder);
       }
@@ -238,11 +255,17 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
   @Transactional(propagation = Propagation.REQUIRES_NEW) // 开启新事务
   private void paySuccess(PayOrder payOrder) {
     try {
+
+      UsageRecord orderItem = usageRecordMapper
+          .selectOne(new LambdaQueryWrapper<UsageRecord>().eq(UsageRecord::getOrderCode, payOrder.getOrderCode()));
+      if (orderItem != null) {
+        log.warn("不能重复创建使用记录: {}", payOrder.getOrderCode());
+        return;
+      }
       PayOrderItem payOrderItem = payOrderItemService.getOrderItemByOrderCode(payOrder.getOrderCode()).getData();
       if (payOrderItem == null) {
         throw new BusinessException("订单项不存在");
       }
-
       LocalDateTime nowTime = LocalDateTime.now();
       // 支付成功，生成使用记录
       UsageRecordAddReqDto usageRecordAddReqDto = new UsageRecordAddReqDto();
@@ -297,9 +320,10 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
 
       return RestResp.ok(true);
     } catch (Exception e) {
-      log.error("取消订单失败", e);
-      throw new BusinessException("取消订单失败");
+      log.error("[cancelOrder]: 取消订单失败", e.getMessage());
+      return null;
     }
+
   }
 
   @Override
@@ -321,5 +345,41 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     List<PayOrder> orderList = this.list(queryWrapper);
 
     return RestResp.ok(orderList);
+  }
+
+  @Override
+  public RestResp<Boolean> refundOrder(RefundOrderReqDto reqDto) {
+    try {
+      PayOrder payOrder = payOrderMapper.selectOne(new LambdaQueryWrapper<PayOrder>()
+          .eq(PayOrder::getOrderCode, reqDto.getOrderCode()));
+      if (payOrder == null) {
+        log.warn("订单不存在: {}", reqDto.getOrderCode());
+        return RestResp.fail("订单不存在");
+      }
+
+      PaymentType paymentType = PaymentType.fromCode(payOrder.getPayWay());
+      payOrder.setOrderStatus(OrderStatus.REFUNDING);
+      payOrder.setRefundReqTime(LocalDateTime.now());
+      payOrderMapper.updateById(payOrder);
+
+      if (paymentType == PaymentType.ALIPAY) {
+        RefundOrderRespDto respDto = alipayStrategy.refund(payOrder, reqDto);
+        if (respDto.getStatus() == "1") {
+          payOrder.setOrderStatus(OrderStatus.REFUNDED);
+          payOrder.setRefundAmount(new BigDecimal(respDto.getAlipayResp().getRefundFee()));
+          payOrder.setRefundTime(respDto.getAlipayResp().getGmtRefundPay().toInstant()
+              .atZone(ZoneId.systemDefault())
+              .toLocalDateTime());
+          payOrderMapper.updateById(payOrder);
+          return RestResp.ok(true);
+        }
+        return RestResp.ok(false);
+      }
+      return RestResp.ok(false);
+    } catch (Exception e) {
+      log.warn("[refundOrder]: 退款失败", e.getMessage());
+      return RestResp.ok(false);
+    }
+
   }
 }
