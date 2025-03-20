@@ -54,6 +54,7 @@ public class UsageRecordServiceImpl extends ServiceImpl<UsageRecordMapper, Usage
         new LambdaQueryWrapper<UsageRecord>()
             .eq(UsageRecord::getUserId, userId)
             .eq(UsageRecord::getPurchaseStatus, 1)
+            .orderByDesc(UsageRecord::getCreatedAt) // 按创建时间降序排序
             .last("LIMIT 1"));
 
     if (record == null) {
@@ -122,7 +123,7 @@ public class UsageRecordServiceImpl extends ServiceImpl<UsageRecordMapper, Usage
     usageRecord.setDeviceLimit(params.getDeviceLimit());
     usageRecord.setDataAllowance(params.getDataAllowance());
     usageRecord.setSpeedLimit(params.getSpeedLimit());
-
+    usageRecord.setNextResetDate(LocalDateTime.now().plusDays(30));
     try {
       // 插入记录后，监听服务器会自动识别
       usageRecordMapper.insert(usageRecord);
@@ -167,7 +168,7 @@ public class UsageRecordServiceImpl extends ServiceImpl<UsageRecordMapper, Usage
       UsageRecord record = usageRecordMapper.selectOne(
           new LambdaQueryWrapper<UsageRecord>()
               .eq(UsageRecord::getUserId, dto.getUserId())
-              .eq(UsageRecord::getPackageId, dto.getPackageId())
+              .orderByDesc(UsageRecord::getCreatedAt) // 按创建时间降序排序
               .last("LIMIT 1"));
       record.setPurchaseStatus(3);
       usageRecordMapper.updateById(record);

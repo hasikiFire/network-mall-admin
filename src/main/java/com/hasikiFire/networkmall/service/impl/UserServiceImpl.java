@@ -469,7 +469,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
       String yamlContent = YamlBuilder.buildYaml(clashHttpProxies);
 
       UsageRecord usageRecord = usageRecordMapper
-          .selectOne(new QueryWrapper<UsageRecord>().eq("user_id", linkItem.getUserId()));
+          .selectOne(new LambdaQueryWrapper<UsageRecord>().eq(UsageRecord::getUserId, linkItem.getUserId())
+              .eq(UsageRecord::getPurchaseStatus, 1));
       if (usageRecord == null) {
         throw new BusinessException("用户没有购买套餐");
       }
