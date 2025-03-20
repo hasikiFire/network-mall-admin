@@ -64,7 +64,6 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
   private final UserMapper userMapper;
   private final PayOrderService payOrderService;
   private final PayOrderItemService payOrderItemService;
-  private final UsageRecordService usageRecordService;
   private final UsageRecordMapper usageRecordMapper;
 
   // private final RateLimiter rateLimiter;

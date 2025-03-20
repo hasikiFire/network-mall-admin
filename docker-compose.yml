@@ -2,6 +2,8 @@ version: "3.8"
 services:
   app:
     image: network-mall-admin-${SPRING_PROFILES_ACTIVE:-test} # 动态设置镜像名称
+    volumes:
+      - /opt/network-mall-admin/logs:/app/logs 
     container_name: network-mall-admin-${SPRING_PROFILES_ACTIVE:-test} # 动态设置容器名称
     ports:
       - "29999:8080"

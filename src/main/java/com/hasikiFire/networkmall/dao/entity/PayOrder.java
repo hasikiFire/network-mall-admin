@@ -75,10 +75,10 @@ public class PayOrder implements Serializable {
     private LocalDateTime orderExpireTime;
 
     /**
-     * 订单状态，wait_pay(待支付)、paid(已支付)、refunding(退款中)、refunded(已退款)、closed(订单关闭)、canceled(订单取消)
+     * 订单状态，订单状态，WAIT_PAY(待支付)、PAID(已支付)、
+     * REFUNDING(退款中)、REFUNDED(已退款)、CLOSED(订单关闭)、CANCELED(订单取消)、COMPLETE(已完成)
      */
-    @Schema(description = "订单状态", example = "wait_pay", allowableValues = { "wait_pay", "paid", "refunding", "refunded",
-            "closed" })
+    @Schema(description = "订单状态", example = "WAIT_PAY")
     private OrderStatus orderStatus;
 
     /**

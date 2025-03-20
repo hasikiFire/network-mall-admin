@@ -297,6 +297,8 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
       usageRecordAddReqDto.setSpeedLimit(payOrderItem.getSpeedLimit());
       usageRecordAddReqDto.setMonth(payOrderItem.getPackageUnit());
       usageRecordService.createRecord(usageRecordAddReqDto);
+      payOrder.setOrderStatus(OrderStatus.COMPLETE);
+      payOrderMapper.updateById(payOrder);
       // return RestResp.ok(PackageRespDto.builder().payOrder(payOrder).build());
 
     } catch (Exception e) {

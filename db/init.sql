@@ -58,8 +58,8 @@ CREATE TABLE pay_order (
   package_unit INT NOT NULL DEFAULT '0' COMMENT '计费周期。单位：月份',
   order_create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '订单创建日期',
   order_expire_time timestamp DEFAULT NULL COMMENT '订单过期日期',
-  order_status varchar(16) NOT NULL DEFAULT 'wait_pay' COMMENT '订单状态， wait_pay(待支付)、
-  paid(支付成功)refunding退款中)、refunded(已退款)、closed(订单关闭)、canceled(订单取消)、complete(订单已完成)',
+  order_status varchar(16) NOT NULL DEFAULT 'WAIT_PAY' COMMENT '订单状态，WAIT_PAY(待支付)、PAID(已支付)、
+  REFUNDING(退款中)、REFUNDED(已退款)、CLOSED(订单关闭)、CANCELED(订单取消)、COMPLETE(已完成)',
   order_remark varchar(128) COMMENT '订单备注',
   -- 支付
   order_amount decimal(10, 2) NOT NULL DEFAULT '0.00' COMMENT '订单金额',

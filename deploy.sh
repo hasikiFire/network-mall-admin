@@ -27,12 +27,18 @@ git clone "$REPO_URL"
 echo ">> 复制配置文件到项目目录..."
 cp $CONFIG_FILE ./$PROJECT_NAME/src/main/resources/application-prod.yml
 
-# Step 3: 构建 Docker 镜像
+
+# Step 3新增步骤：创建日志目录并赋权
+echo ">> 创建日志目录并设置权限..."
+mkdir -p ./logs
+chmod 777 ./logs  # 确保容器有写入权限
+
+# Step 4: 构建 Docker 镜像
 echo ">> 构建 Docker 镜像..."
 cd "$PROJECT_NAME"
 docker build --build-arg SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE -t network-mall-admin-$SPRING_PROFILES_ACTIVE .
 
-# Step 4: 启动 Docker 容器
+# Step 5: 启动 Docker 容器
 echo ">> 启动 Docker 容器..."
 export SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE # 设置环境变量
 docker-compose down || true
