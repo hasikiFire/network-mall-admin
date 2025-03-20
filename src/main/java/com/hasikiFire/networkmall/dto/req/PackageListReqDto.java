@@ -1,7 +1,5 @@
 package com.hasikiFire.networkmall.dto.req;
 
-import java.math.BigDecimal;
-
 import com.hasikiFire.networkmall.core.common.req.PageReqDto;
 
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -14,6 +14,7 @@ import com.hasikiFire.networkmall.dao.entity.User;
 import com.hasikiFire.networkmall.dto.req.PackageAddReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageEditReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageListReqDto;
+import com.hasikiFire.networkmall.dto.req.RefundOrderReqDto;
 import com.hasikiFire.networkmall.dto.req.UserCreateDto;
 import com.hasikiFire.networkmall.dto.req.UserEditDto;
 import com.hasikiFire.networkmall.dto.req.UserListReqDto;
@@ -21,8 +22,12 @@ import com.hasikiFire.networkmall.dto.resp.PackageListRespDto;
 import com.hasikiFire.networkmall.dto.resp.PackageRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserListRespDto;
 import com.hasikiFire.networkmall.service.PackageService;
+import com.hasikiFire.networkmall.service.PayOrderService;
 import com.hasikiFire.networkmall.service.UserService;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.annotation.SaCheckRole;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,9 +37,12 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
+@SaCheckLogin
+@SaCheckRole("admin")
 public class AdminController {
   private final UserService userService;
   private final PackageService packageService;
+  private final PayOrderService payOrderService;
 
   @Operation(summary = "查询用户列表")
   @GetMapping("/user/getList")
@@ -79,4 +87,9 @@ public class AdminController {
     return packageService.addPackage(params);
   }
 
+  @Operation(summary = "申请退款")
+  @PostMapping("/payOrder/refund")
+  public RestResp<Boolean> refundOrder(@Valid @RequestBody RefundOrderReqDto reqDto) {
+    return payOrderService.refundOrder(reqDto);
+  }
 }

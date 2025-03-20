@@ -17,6 +17,7 @@ import com.hasikiFire.networkmall.dao.mapper.UsageRecordMapper;
 import com.hasikiFire.networkmall.dao.mapper.UserCouponMapper;
 import com.hasikiFire.networkmall.dto.req.CancelOrderReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageBuyReqDto;
+import com.hasikiFire.networkmall.dto.req.PollOrdersReqDto;
 import com.hasikiFire.networkmall.dto.req.RefundOrderReqDto;
 import com.hasikiFire.networkmall.dto.req.UsageRecordAddReqDto;
 import com.hasikiFire.networkmall.dto.resp.PollOrdersRespDto;
@@ -255,11 +256,11 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         payOrderMapper.updateById(payOrder);
         this.paySuccess(payOrder);
       }
-
-      return RestResp.ok(PollOrdersRespDto.builder()
-          .orderCode(orderCode)
-          .status(response.getStatus())
-          .build());
+      response.setAlipayResp(null);
+      if (response.getStatus().equals("-1")) {
+        return RestResp.fail(response.getSubMsg(), response);
+      }
+      return RestResp.ok(response);
     }
 
     return RestResp.ok(PollOrdersRespDto.builder()
@@ -314,7 +315,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     }
 
     // 检查订单状态是否可取消（只有未支付的订单可以取消）
-    if (!"wait_pay".equals(order.getOrderStatus())) {
+    if (!OrderStatus.WAIT_PAY.equals(order.getOrderStatus())) {
       throw new BusinessException("该订单状态不可取消");
     }
 
@@ -324,15 +325,18 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
       order.setOrderExpireTime(LocalDateTime.now());
 
       // 回滚优惠券使用次数
-      RestResp<UserCoupon> couponResp = userCouponService.getCouponByCode(order.getCouponCode());
-      if (couponResp == null || couponResp.getData() == null) {
-        log.warn("优惠券不存在: {}");
+      if (order.getCouponCode() != null && !order.getCouponCode().isEmpty()) {
 
+        RestResp<UserCoupon> couponResp = userCouponService.getCouponByCode(order.getCouponCode());
+        if (couponResp != null && couponResp.getData() == null) {
+          UserCoupon userCoupon = couponResp.getData();
+          userCoupon.setUseCount(userCoupon.getUseCount() - 1);
+          userCouponMapper.updateById(userCoupon);
+        } else {
+          log.warn("优惠券不存在: {}");
+        }
       }
-      UserCoupon userCoupon = couponResp.getData();
-      userCoupon.setUseCount(userCoupon.getUseCount() - 1);
 
-      userCouponMapper.updateById(userCoupon);
       payOrderMapper.updateById(order);
 
       return RestResp.ok(true);
@@ -415,7 +419,8 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         .eq(PayOrder::getPackageId, packageItem.getPackageId())
         .eq(PayOrder::getUserId, packageItem.getUserId())
         .eq(PayOrder::getPackageUnit, packageItem.getMonth())
-        .eq(PayOrder::getCouponCode, packageItem.getCouponCode()));
+        .eq(PayOrder::getCouponCode, packageItem.getCouponCode())
+        .eq(PayOrder::getOrderStatus, OrderStatus.WAIT_PAY));
     if (payOrder != null && payOrder.getOrderExpireTime().isAfter(LocalDateTime.now())) {
       return payOrder;
     }

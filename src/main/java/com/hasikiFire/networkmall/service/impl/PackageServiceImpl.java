@@ -206,7 +206,7 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
 
     PayOrder existPayOrder = payOrderService.checkExistPayOrder(reqDto);
     if (existPayOrder != null && existPayOrder.getPayQrCodes() != null) {
-      
+
       log.info("[buyPackage] 已有相同订单，返回上次订单二维码");
       // return RestResp.error("您有未完成的订单，请先完成再购买");
       ObjectMapper mapper = new ObjectMapper();
@@ -218,6 +218,7 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
             .paymentType(existPayOrder.getPayWay())
             .status("1")
             .payUrl(payQrcode.getQrcode())
+            .expireTime(String.valueOf(existPayOrder.getOrderExpireTime()))
             .build());
       } catch (JsonProcessingException e) {
         log.error("[PayOrderServiceImpl payOrder] 支付宝下单成功响应转换json失败: {}", e.getMessage());

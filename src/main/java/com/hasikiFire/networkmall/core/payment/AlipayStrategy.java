@@ -93,6 +93,7 @@ public class AlipayStrategy implements PaymentStrategy {
             .amount(order.getOrderAmount())
             .paymentType(order.getPayWay())
             .status("1")
+            .expireTime(String.valueOf(order.getOrderExpireTime()))
             .payUrl(response.getQrCode())
             // .data(response.getBody())
             .build();
@@ -143,36 +144,55 @@ public class AlipayStrategy implements PaymentStrategy {
   }
 
   @Override
-  public PollOrdersRespDto queryStatus(String orderId) {
+  public PollOrdersRespDto queryStatus(String orderCode) {
     try {
       // 构造请求参数以调用接口
       AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
       AlipayTradeQueryModel model = new AlipayTradeQueryModel();
 
       // 设置订单支付时传入的商户订单号
-      model.setOutTradeNo(orderId);
+      model.setOutTradeNo(orderCode);
       request.setBizModel(model);
       AlipayTradeQueryResponse response = alipayClient.execute(request);
 
       if (response.isSuccess()) {
         log.info("[AlipayStrategy queryStatus] 支付宝支付结果查询成功 {}", response.getBody());
         String tradeStatus = response.getTradeStatus();
+        String status = "";
         switch (tradeStatus) {
           case "TRADE_SUCCESS":
-            return createPollResponse(orderId, "1", response);
+            status = "1";
+            break;
           case "WAIT_BUYER_PAY":
-            return createPollResponse(orderId, "0", response);
+            status = "0";
+            break;
           case "TRADE_CLOSED":
-            return createPollResponse(orderId, "2", response);
+            status = "2";
+            break;
           case "TRADE_FINISHED":
-            return createPollResponse(orderId, "3", response);
+            status = "3";
+            break;
           default:
-            return createPollResponse(orderId, "0", response);
+            status = "0";
         }
+        return PollOrdersRespDto.builder()
+            .orderCode(orderCode)
+            .status(status)
+            .alipayResp(response)
+            .build();
 
       } else {
-        log.info("[AlipayStrategy queryStatus] 支付宝支付结果查询失败 {}", response.getBody());
-        throw new RuntimeException("[AlipayStrategy queryStatus] 支付宝支付结果查询失败");
+        // https://opendocs.alipay.com/support/01raw9?pathHash=1185bf61
+        // 没有扫码也是交易不存在！垃圾！
+        log.info("[AlipayStrategy queryStatus] 支付宝支付结果查询 {}", response.getBody());
+        return PollOrdersRespDto.builder()
+            .orderCode(orderCode)
+            .status("0")
+            .alipayResp(response)
+            .errorCode(response.getCode())
+            .msg(response.getMsg())
+            .subMsg(response.getSubMsg())
+            .build();
       }
     } catch (AlipayApiException e) {
       log.error("[AlipayStrategy refund] 支付宝支付结果查询失败 ");
@@ -180,17 +200,6 @@ public class AlipayStrategy implements PaymentStrategy {
     }
     return null;
 
-  }
-
-  /**
-   * 创建轮询响应
-   */
-  private PollOrdersRespDto createPollResponse(String orderCode, String status, AlipayTradeQueryResponse response) {
-    return PollOrdersRespDto.builder()
-        .orderCode(orderCode)
-        .status(status)
-        .alipayResp(response)
-        .build();
   }
 
   private AlipayConfig getAlipayConfig() {

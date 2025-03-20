@@ -1,11 +1,13 @@
 package com.hasikiFire.networkmall.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import java.util.List;
@@ -16,6 +18,7 @@ import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.dao.entity.PayOrder;
 import com.hasikiFire.networkmall.dto.req.CancelOrderReqDto;
+import com.hasikiFire.networkmall.dto.req.PollOrdersReqDto;
 import com.hasikiFire.networkmall.dto.req.QueryOrderReqDto;
 import com.hasikiFire.networkmall.dto.req.RefundOrderReqDto;
 import com.hasikiFire.networkmall.dto.req.UsersendEmailCodeDto;
@@ -51,15 +54,9 @@ public class PayOrderController {
     return payOrderService.cancelOrder(reqDto);
   }
 
-  @Operation(summary = "申请退款")
-  @PostMapping("/refund")
-  public RestResp<Boolean> refundOrder(@Valid @RequestBody RefundOrderReqDto reqDto) {
-    return payOrderService.refundOrder(reqDto);
-  }
-
   @Operation(summary = "轮询订单")
-  @GetMapping("/pollOrders/{id}")
-  public RestResp<PollOrdersRespDto> pollOrders(@PathVariable String id) {
-    return payOrderService.pollOrders(id);
+  @GetMapping("/pollOrder")
+  public RestResp<PollOrdersRespDto> pollOrders(@RequestParam String orderCode) {
+    return payOrderService.pollOrders(orderCode);
   }
 }

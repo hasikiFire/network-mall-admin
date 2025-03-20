@@ -46,6 +46,12 @@ public class RestResp<T> {
         this.message = msg;
     }
 
+    private RestResp(ErrorCodeEnum errorCode, String msg, T data) {
+        this.code = errorCode.getCode();
+        this.message = msg;
+        this.data = data;
+    }
+
     private RestResp(T data) {
         this();
         this.data = data;
@@ -78,6 +84,10 @@ public class RestResp<T> {
 
     public static <T> RestResp<T> fail(String message) {
         return new RestResp<T>(ErrorCodeEnum.SYSTEM_ERROR, message);
+    }
+
+    public static <T> RestResp<T> fail(String message, T data) {
+        return new RestResp<T>(ErrorCodeEnum.SYSTEM_ERROR, message, data);
     }
 
     /**
