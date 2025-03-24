@@ -20,6 +20,7 @@ import com.hasikiFire.networkmall.dto.req.UserEditDto;
 import com.hasikiFire.networkmall.dto.req.UserListReqDto;
 import com.hasikiFire.networkmall.dto.resp.PackageListRespDto;
 import com.hasikiFire.networkmall.dto.resp.PackageRespDto;
+import com.hasikiFire.networkmall.dto.resp.RefundOrderRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserListRespDto;
 import com.hasikiFire.networkmall.service.PackageService;
 import com.hasikiFire.networkmall.service.PayOrderService;
@@ -89,7 +90,7 @@ public class AdminController {
 
   @Operation(summary = "申请退款")
   @PostMapping("/payOrder/refund")
-  public RestResp<Boolean> refundOrder(@Valid @RequestBody RefundOrderReqDto reqDto) {
+  public RestResp<RefundOrderRespDto> refundOrder(@Valid @RequestBody RefundOrderReqDto reqDto) {
     return payOrderService.refundOrder(reqDto);
   }
 }

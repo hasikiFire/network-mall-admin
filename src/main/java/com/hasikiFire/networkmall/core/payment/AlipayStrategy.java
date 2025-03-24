@@ -119,7 +119,7 @@ public class AlipayStrategy implements PaymentStrategy {
       model.setOutTradeNo(payOrder.getOrderCode());
 
       // 设置退款金额
-      model.setRefundAmount(String.valueOf(payOrder.getPayAmount()));
+      model.setRefundAmount(String.valueOf(payOrder.getOrderAmount()));
 
       // 设置退款原因说明
       model.setRefundReason(reqDto.getRefundReason());
@@ -132,9 +132,17 @@ public class AlipayStrategy implements PaymentStrategy {
       if (response.isSuccess()) {
         log.info("[AlipayStrategy refund] 支付宝退款成功: {}", response.getBody());
         return RefundOrderRespDto.builder().orderCode(payOrder.getOrderCode()).status("1").alipayResp(response).build();
+      } else {
+        log.info("[AlipayStrategy refund] 支付宝退款成功: {}", response.getBody());
+        return RefundOrderRespDto.builder()
+            .orderCode(payOrder.getOrderCode())
+            .status("-1")
+            .alipayResp(response)
+            .errorCode(response.getCode())
+            .msg(response.getMsg())
+            .subMsg(response.getSubMsg())
+            .build();
       }
-      log.warn("[AlipayStrategy refund] 支付宝退款失败: {}", response.getBody());
-      return RefundOrderRespDto.builder().orderCode(payOrder.getOrderCode()).status("1").alipayResp(response).build();
 
     } catch (AlipayApiException e) {
       log.error("[AlipayStrategy refund] 支付宝退款失败: {}");

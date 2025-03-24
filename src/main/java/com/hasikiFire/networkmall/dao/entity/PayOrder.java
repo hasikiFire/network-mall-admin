@@ -73,6 +73,7 @@ public class PayOrder implements Serializable {
      */
     @Schema(description = "订单过期日期", example = "2026-01-08T10:00:00")
     private LocalDateTime orderExpireTime;
+    // 应该跟付款过期时间一样吗？还是区分
 
     /**
      * 订单状态，订单状态，WAIT_PAY(待支付)、PAID(已支付)、

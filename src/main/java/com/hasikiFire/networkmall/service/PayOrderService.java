@@ -9,6 +9,7 @@ import com.hasikiFire.networkmall.dto.req.PackageBuyReqDto;
 import com.hasikiFire.networkmall.dto.req.PollOrdersReqDto;
 import com.hasikiFire.networkmall.dto.req.RefundOrderReqDto;
 import com.hasikiFire.networkmall.dto.resp.PollOrdersRespDto;
+import com.hasikiFire.networkmall.dto.resp.RefundOrderRespDto;
 import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
 
@@ -70,7 +71,7 @@ public interface PayOrderService extends IService<PayOrder> {
    */
   RestResp<List<PayOrder>> getOrderList();
 
-  RestResp<Boolean> refundOrder(RefundOrderReqDto reqDto);
+  RestResp<RefundOrderRespDto> refundOrder(RefundOrderReqDto reqDto);
 
   PayOrder checkExistPayOrder(PackageBuyReqDto packageItem);
 }

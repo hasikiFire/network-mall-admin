@@ -17,7 +17,6 @@ import com.hasikiFire.networkmall.dao.mapper.UsageRecordMapper;
 import com.hasikiFire.networkmall.dao.mapper.UserCouponMapper;
 import com.hasikiFire.networkmall.dto.req.CancelOrderReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageBuyReqDto;
-import com.hasikiFire.networkmall.dto.req.PollOrdersReqDto;
 import com.hasikiFire.networkmall.dto.req.RefundOrderReqDto;
 import com.hasikiFire.networkmall.dto.req.UsageRecordAddReqDto;
 import com.hasikiFire.networkmall.dto.resp.PollOrdersRespDto;
@@ -371,7 +370,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
   }
 
   @Override
-  public RestResp<Boolean> refundOrder(RefundOrderReqDto reqDto) {
+  public RestResp<RefundOrderRespDto> refundOrder(RefundOrderReqDto reqDto) {
     try {
       PayOrder payOrder = payOrderMapper.selectOne(new LambdaQueryWrapper<PayOrder>()
           .eq(PayOrder::getOrderCode, reqDto.getOrderCode()));
@@ -379,7 +378,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         log.warn("订单不存在: {}", reqDto.getOrderCode());
         return RestResp.fail("订单不存在");
       }
-      if (payOrder.getOrderStatus() != OrderStatus.PAID) {
+      if (payOrder.getOrderStatus() != OrderStatus.PAID || payOrder.getOrderStatus() != OrderStatus.COMPLETE) {
         log.warn("订单状态不正确: {}", payOrder.getOrderStatus());
         return RestResp.fail("订单状态非付款状态");
       }
@@ -402,14 +401,19 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
               .selectOne(new LambdaQueryWrapper<UsageRecord>().eq(UsageRecord::getOrderCode, payOrder.getOrderCode()));
           usageRecord.setPurchaseStatus(4);
           usageRecordMapper.updateById(usageRecord);
-          return RestResp.ok(true);
+          respDto.setAlipayResp(null);
+          return RestResp.ok(respDto);
         }
-        return RestResp.ok(false);
+        if (respDto.getStatus() == "-1") {
+          respDto.setAlipayResp(null);
+          return RestResp.fail(respDto.getSubMsg(), respDto);
+        }
+        return RestResp.fail(respDto.getSubMsg(), respDto);
       }
-      return RestResp.ok(false);
+      return RestResp.fail("退款失败，未找到此种支付方式的退款流程");
     } catch (Exception e) {
       log.warn("[refundOrder]: 退款失败", e.getMessage());
-      return RestResp.ok(false);
+      return RestResp.fail("退款失败: " + e.getMessage());
     }
 
   }
