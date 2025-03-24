@@ -378,7 +378,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         log.warn("订单不存在: {}", reqDto.getOrderCode());
         return RestResp.fail("订单不存在");
       }
-      if (payOrder.getOrderStatus() != OrderStatus.PAID || payOrder.getOrderStatus() != OrderStatus.COMPLETE) {
+      if (payOrder.getOrderStatus() != OrderStatus.PAID && payOrder.getOrderStatus() != OrderStatus.COMPLETE) {
         log.warn("订单状态不正确: {}", payOrder.getOrderStatus());
         return RestResp.fail("订单状态非付款状态");
       }
