@@ -6,6 +6,12 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.hasikiFire.networkmall.core.common.enums.OrderStatus;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -21,6 +27,11 @@ import java.time.LocalDateTime;
  */
 @Schema(description = "订单表")
 @TableName("pay_order")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder(toBuilder = true)  // 支持基于现有对象修改
+@Getter
+@Setter
 public class PayOrder implements Serializable {
 
     private static final long serialVersionUID = 1L;

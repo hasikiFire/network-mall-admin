@@ -75,7 +75,7 @@ public class UserController {
   @Operation(summary = "用户信息查询接口")
   @GetMapping("/getUserInfo")
   @SaCheckLogin
-  public RestResp<UserInfoRespDto> getUserInfo(Long userId) {
+  public RestResp<UserInfoRespDto> getUserInfo(@RequestParam Long userId) {
     return userService.getUserInfo(userId);
   }
 

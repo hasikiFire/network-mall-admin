@@ -2,6 +2,8 @@ package com.hasikiFire.networkmall.service.impl;
 
 import com.hasikiFire.networkmall.core.common.enums.OrderStatus;
 import com.hasikiFire.networkmall.core.common.exception.BusinessException;
+import com.hasikiFire.networkmall.core.common.req.PageReqDto;
+import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.core.payment.AlipayStrategy;
 import com.hasikiFire.networkmall.core.payment.PayQrcode;
@@ -19,6 +21,7 @@ import com.hasikiFire.networkmall.dto.req.CancelOrderReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageBuyReqDto;
 import com.hasikiFire.networkmall.dto.req.RefundOrderReqDto;
 import com.hasikiFire.networkmall.dto.req.UsageRecordAddReqDto;
+import com.hasikiFire.networkmall.dto.resp.PackageListRespDto;
 import com.hasikiFire.networkmall.dto.resp.PollOrdersRespDto;
 import com.hasikiFire.networkmall.dto.resp.RefundOrderRespDto;
 import com.hasikiFire.networkmall.service.ConfigService;
@@ -33,6 +36,7 @@ import cn.hutool.core.util.IdUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,12 +45,15 @@ import cn.dev33.satoken.stp.StpUtil;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -431,5 +438,22 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
       return payOrder;
     }
     return null;
+  }
+
+  @Override
+  public RestResp<PageRespDto<PayOrder>> getAllOrderList(PageReqDto reqDto) {
+    IPage<PayOrder> page = new Page<>();
+    page.setCurrent(reqDto.getPageNum());
+    page.setSize(reqDto.getPageSize());
+
+    LambdaQueryWrapper<PayOrder> queryWrapper = new LambdaQueryWrapper<PayOrder>();
+    queryWrapper.eq(PayOrder::getDeleted, 0);
+    IPage<PayOrder> pPage = payOrderMapper.selectPage(page, queryWrapper);
+    List<PayOrder> payOrders = pPage.getRecords();
+    List<PayOrder> payOrderList = payOrders.stream().map(p -> p.toBuilder().payQrCodes(null).build())
+        .collect(Collectors.toList());
+
+    return RestResp.ok(
+        PageRespDto.of(reqDto.getPageNum(), reqDto.getPageSize(), page.getTotal(), payOrderList));
   }
 }

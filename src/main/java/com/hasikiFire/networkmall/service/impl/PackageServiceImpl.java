@@ -26,6 +26,8 @@ import com.hasikiFire.networkmall.service.PayOrderItemService;
 import com.hasikiFire.networkmall.service.PayOrderService;
 import com.hasikiFire.networkmall.service.UsageRecordService;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 import com.alibaba.fastjson.JSON;
 import com.alipay.api.domain.Person;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -43,6 +46,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.bouncycastle.crypto.util.Pack;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,7 +84,6 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
 
     IPage<PackageItem> pPage = packageMapper.selectPage(page, queryWrapper);
     List<PackageItem> packages = pPage.getRecords();
-    log.info("getUserPackageList pPage: {}", pPage);
     List<PackageListRespDto> packageListRespDtos = packages.stream().map(p -> {
       return PackageListRespDto.builder().id(p.getId()).packageName(p.getPackageName())
           .packageDesc(p.getPackageDesc()).packageStatus(p.getPackageStatus()).originalPrice(p.getOriginalPrice())
@@ -140,28 +143,58 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
   public RestResp<Void> editPackage(@Valid PackageEditReqDto reqDto) {
     if (reqDto.getDiscountStartDate() != null) {
       if (reqDto.getDiscountEndDate() == null) {
-        throw new BusinessException("折扣开始日期不为空时，折扣结束日期不能为空");
+        return RestResp.fail("折扣开始日期不为空时，折扣结束日期不能为空");
       }
       if (reqDto.getDiscountStartDate().isAfter(reqDto.getDiscountEndDate())) {
-        throw new BusinessException("折扣开始日期必须在结束日期之前");
+        return RestResp.fail("折扣开始日期必须在结束日期之前");
       }
     }
 
     // 检查套餐名称是否已存在
     if (packageMapper.existsByPackageName(reqDto.getPackageName())) {
-      throw new BusinessException("套餐名称已存在");
-    }
-    PackageItem packageItem = packageMapper.selectById(reqDto.getId());
-    log.info("editPackage packageItem: {}", packageItem);
-    if (packageItem == null) {
-      throw new BusinessException("套餐不存在");
+      return RestResp.fail("套餐名称已存在");
     }
 
+    PackageItem packageItem = packageMapper
+        .selectOne(
+            new LambdaQueryWrapper<PackageItem>().eq(PackageItem::getId, reqDto.getId()).eq(PackageItem::getDeleted,
+                0));
+    log.info("editPackage packageItem: {}", packageItem);
+    if (packageItem == null) {
+      return RestResp.fail("套餐不存在");
+    }
+
+    // 3. 动态构建 UpdateWrapper，只更新非 null 字段
+    LambdaUpdateWrapper<PackageItem> updateWrapper = new LambdaUpdateWrapper<>();
+    updateWrapper.eq(PackageItem::getId, reqDto.getId());
+
+    // 逐个检查字段是否为 null，非 null 才加入更新
+    if (reqDto.getPackageName() != null) {
+      updateWrapper.set(PackageItem::getPackageName, reqDto.getPackageName());
+    }
+    if (reqDto.getStatus() != null) {
+      updateWrapper.set(PackageItem::getPackageStatus, reqDto.getStatus());
+    }
+    if (reqDto.getPackageDesc() != null) {
+      updateWrapper.set(PackageItem::getPackageDesc, reqDto.getPackageDesc());
+    }
+    // 其他字段同理...
+    if (reqDto.getDiscountStartDate() != null) {
+      updateWrapper.set(PackageItem::getDiscountStartDate, reqDto.getDiscountStartDate());
+    }
+    if (reqDto.getDiscountEndDate() != null) {
+      updateWrapper.set(PackageItem::getDiscountEndDate, reqDto.getDiscountEndDate());
+    }
+
+    // 4. 执行更新
     try {
-      packageMapper.updatePackageItem(reqDto);
+      // updateById 会基于实体对象的所有非 null 字段生成更新 SQL。例如：
+      // UPDATE package_item SET package_name='新套餐', status=null WHERE id=1;
+
+      packageMapper.update(null, updateWrapper); // 第一个参数为 null 表示不更新实体对象
     } catch (Exception e) {
-      // 异常处理
-      throw new BusinessException("编辑套餐失败：" + e.getMessage());
+      log.error("[editPackage] 更新套餐失败：{}", e.getMessage());
+      return RestResp.fail("更新套餐失败：" + e.getMessage());
     }
     return RestResp.ok();
   }
@@ -175,11 +208,11 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
     // }
     PackageItem packageItem = packageMapper.selectById(reqDto.getPackageId());
     if (packageItem == null) {
-      throw new BusinessException("套餐不存在");
+      return RestResp.fail("套餐不存在");
     }
     User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, reqDto.getUserId()));
     if (user == null) {
-      throw new BusinessException("用户不存在");
+      return RestResp.fail("用户不存在");
     }
 
     if (reqDto.getDataAllowance() != null) {
@@ -235,7 +268,8 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
       return RestResp.ok(response);
     } catch (Exception e) {
       // 异常处理
-      throw new BusinessException("生成支付订单失败：" + e.getMessage());
+      log.error("[buyPackage] 生成支付订单失败: {}", e.getMessage());
+      return RestResp.fail("生成支付订单失败：" + e.getMessage());
     }
 
   }
@@ -271,7 +305,6 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
 
     IPage<PackageItem> pPage = packageMapper.selectPage(page, queryWrapper);
     List<PackageItem> packages = pPage.getRecords();
-    log.info("getUserPackageList pPage: {}", pPage.getRecords());
     List<PackageListRespDto> packageListRespDtos = packages.stream().map(p -> {
       return PackageListRespDto.builder().id(p.getId()).packageName(p.getPackageName())
           .packageDesc(p.getPackageDesc()).packageStatus(p.getPackageStatus()).originalPrice(p.getOriginalPrice())

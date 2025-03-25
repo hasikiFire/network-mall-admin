@@ -22,6 +22,8 @@ public class UserInfoRespDto {
 
   private String email;
 
+  private String role;
+
   private LocalDateTime createdAt;
 
   private LocalDateTime updatedAt;

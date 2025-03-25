@@ -1,9 +1,13 @@
 package com.hasikiFire.networkmall.service;
 
+import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.dao.entity.UsageRecord;
 import com.hasikiFire.networkmall.dto.req.UsageRecordAddReqDto;
 import com.hasikiFire.networkmall.dto.req.UsageRecordEditReqDto;
+import com.hasikiFire.networkmall.dto.req.UsageRecordListReqDto;
+import com.hasikiFire.networkmall.dto.resp.UsageRecordListRespDto;
+
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -28,4 +32,6 @@ public interface UsageRecordService extends IService<UsageRecord> {
   List<UsageRecord> findRecordsDueForReset(int page, int batchSize);
 
   void batchResetDataUsage(List<UsageRecord> records);
+
+  RestResp<PageRespDto<UsageRecordListRespDto>> getList(UsageRecordListReqDto params);
 }

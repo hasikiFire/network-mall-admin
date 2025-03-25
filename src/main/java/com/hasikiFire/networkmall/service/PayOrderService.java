@@ -1,5 +1,7 @@
 package com.hasikiFire.networkmall.service;
 
+import com.hasikiFire.networkmall.core.common.req.PageReqDto;
+import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.core.payment.PayResponse;
 import com.hasikiFire.networkmall.dao.entity.PackageItem;
@@ -74,4 +76,12 @@ public interface PayOrderService extends IService<PayOrder> {
   RestResp<RefundOrderRespDto> refundOrder(RefundOrderReqDto reqDto);
 
   PayOrder checkExistPayOrder(PackageBuyReqDto packageItem);
+
+  /**
+   * 获取所有用户订单列表
+   * 
+   * @return 订单列表
+   */
+  RestResp<PageRespDto<PayOrder>> getAllOrderList(PageReqDto params);
+
 }

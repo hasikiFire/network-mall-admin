@@ -36,12 +36,4 @@ public class UsageRecordController {
     return usageRecordService.recordDetail();
   }
 
-  // 更新套餐使用纪录
-  /*
-   *  
-   */
-  @PutMapping("/update")
-  public RestResp<UsageRecord> updateRecord(@Valid @RequestBody UsageRecordEditReqDto params) {
-    return usageRecordService.updateRecord(params);
-  }
 }

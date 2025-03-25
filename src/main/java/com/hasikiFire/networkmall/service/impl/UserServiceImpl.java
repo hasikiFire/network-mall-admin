@@ -165,11 +165,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
   @Override
   public RestResp<UserInfoRespDto> getUserInfo(Long id) {
-    QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-    queryWrapper.eq(DatabaseConsts.UserInfoTable.COLUMN_USERID,
-        id)
-        .last(DatabaseConsts.SqlEnum.LIMIT_1.getSql());
-    User user = userMapper.selectOne(queryWrapper);
+    User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, id));
+    Roles roles = roleMapper.selectOne(new LambdaQueryWrapper<Roles>().eq(Roles::getUserId, id));
     if (user == null) {
       throw new BusinessException("用户不存在");
     }
@@ -178,6 +175,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             .userId(user.getId())
             .name(user.getName())
             .email(user.getEmail())
+            .role(roles.getRoleName())
             .createdAt(user.getCreatedAt())
             .updatedAt(user.getUpdatedAt())
             .build());

@@ -3,11 +3,18 @@ package com.hasikiFire.networkmall.service.impl;
 import com.hasikiFire.networkmall.core.RabbitMQ.UsageRecordExpire;
 import com.hasikiFire.networkmall.core.common.constant.RabbitMQConstants;
 import com.hasikiFire.networkmall.core.common.exception.BusinessException;
+import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
+import com.hasikiFire.networkmall.dao.entity.PackageItem;
 import com.hasikiFire.networkmall.dao.entity.UsageRecord;
+import com.hasikiFire.networkmall.dao.entity.User;
 import com.hasikiFire.networkmall.dao.mapper.UsageRecordMapper;
+import com.hasikiFire.networkmall.dao.mapper.UserMapper;
 import com.hasikiFire.networkmall.dto.req.UsageRecordAddReqDto;
 import com.hasikiFire.networkmall.dto.req.UsageRecordEditReqDto;
+import com.hasikiFire.networkmall.dto.req.UsageRecordListReqDto;
+import com.hasikiFire.networkmall.dto.resp.PackageListRespDto;
+import com.hasikiFire.networkmall.dto.resp.UsageRecordListRespDto;
 import com.hasikiFire.networkmall.service.UsageRecordService;
 import cn.dev33.satoken.stp.StpUtil;
 import jakarta.validation.Valid;
@@ -15,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
@@ -27,6 +35,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +52,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class UsageRecordServiceImpl extends ServiceImpl<UsageRecordMapper, UsageRecord> implements UsageRecordService {
   private final UsageRecordMapper usageRecordMapper;
+  private final UserMapper userMapper;
   private final RabbitTemplate rabbitTemplate;
 
   @Override
@@ -206,6 +216,69 @@ public class UsageRecordServiceImpl extends ServiceImpl<UsageRecordMapper, Usage
         .eq(UsageRecord::getPurchaseStatus, 1)
         .orderByDesc(UsageRecord::getId);
     return usageRecordMapper.selectPage(pageInfo, queryWrapper).getRecords();
+
+  }
+
+  @Override
+  public RestResp<PageRespDto<UsageRecordListRespDto>> getList(UsageRecordListReqDto reqDto) {
+    IPage<UsageRecord> page = new Page<>();
+    page.setCurrent(reqDto.getPageNum());
+    page.setSize(reqDto.getPageSize());
+
+    LambdaQueryWrapper<UsageRecord> queryWrapper = new LambdaQueryWrapper<UsageRecord>();
+    queryWrapper.eq(UsageRecord::getDeleted, 0);
+    if (reqDto.getUserId() != null) {
+      queryWrapper.eq(UsageRecord::getUserId, reqDto.getUserId());
+    }
+    if (reqDto.getPackageId() != null) {
+      queryWrapper.eq(UsageRecord::getPackageId, reqDto.getPackageId());
+    }
+    if (reqDto.getPurchaseStatus() != null) {
+      queryWrapper.eq(UsageRecord::getPurchaseStatus, reqDto.getPurchaseStatus());
+    }
+    // if (reqDto.getPurchaseStartTime() != null) {
+    // queryWrapper.ge(UsageRecord::getPurchaseStartTime,
+    // reqDto.getPurchaseStartTime());
+    // }
+    // if (reqDto.getPurchaseEndTime() != null) {
+    // queryWrapper.le(UsageRecord::getPurchaseEndTime,
+    // reqDto.getPurchaseEndTime());
+    // }
+    if (reqDto.getOrderCode() != null) {
+      queryWrapper.eq(UsageRecord::getOrderCode, reqDto.getOrderCode());
+    }
+    // if (reqDto.getDataAllowance() != null) {
+    // queryWrapper.eq(UsageRecord::getDataAllowance, reqDto.getDataAllowance());
+    // }
+    // if (reqDto.getConsumedDataTransfer() != null) {
+    // queryWrapper.eq(UsageRecord::getConsumedDataTransfer,
+    // reqDto.getConsumedDataTransfer());
+    // }
+    // if (reqDto.getSpeedLimit() != null) {
+    // queryWrapper.eq(UsageRecord::getSpeedLimit, reqDto.getSpeedLimit());
+    // }
+
+    queryWrapper.orderByDesc(UsageRecord::getId);
+
+    IPage<UsageRecord> pPage = usageRecordMapper.selectPage(page, queryWrapper);
+    List<UsageRecord> usageRecords = pPage.getRecords();
+    List<UsageRecordListRespDto> usageRecordListRespDto = usageRecords.stream().map(p -> {
+      User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, p.getUserId()));
+
+      return UsageRecordListRespDto.builder().id(p.getId()).packageId(p.getPackageId())
+          .orderCode(p.getOrderCode()).userId(p.getUserId()).purchaseStatus(p.getPurchaseStatus())
+          .purchaseStartTime(p.getPurchaseStartTime()).purchaseEndTime(p.getPurchaseEndTime())
+          .dataAllowance(p.getDataAllowance()).consumedDataTransfer(p.getConsumedDataTransfer())
+          .consumedDataDownload(p.getConsumedDataDownload())
+          .consumedDataUpload(p.getConsumedDataUpload()).speedLimit(p.getSpeedLimit())
+          .deviceNum(p.getDeviceNum()).deviceLimit(p.getDeviceLimit()).nextResetDate(p.getNextResetDate())
+          .userName(user.getName())
+          .createdAt(p.getCreatedAt()).updatedAt(p.getUpdatedAt()).deleted(p.getDeleted()).build();
+
+    }).collect(Collectors.toList());
+
+    return RestResp.ok(
+        PageRespDto.of(reqDto.getPageNum(), reqDto.getPageSize(), page.getTotal(), usageRecordListRespDto));
 
   }
 

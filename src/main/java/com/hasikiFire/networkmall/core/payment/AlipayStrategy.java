@@ -133,7 +133,7 @@ public class AlipayStrategy implements PaymentStrategy {
         log.info("[AlipayStrategy refund] 支付宝退款成功: {}", response.getBody());
         return RefundOrderRespDto.builder().orderCode(payOrder.getOrderCode()).status("1").alipayResp(response).build();
       } else {
-        log.info("[AlipayStrategy refund] 支付宝退款成功: {}", response.getBody());
+        log.info("[AlipayStrategy refund] 支付宝退款失败: {}", response.getBody());
         return RefundOrderRespDto.builder()
             .orderCode(payOrder.getOrderCode())
             .status("-1")
