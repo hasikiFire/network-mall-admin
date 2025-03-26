@@ -137,7 +137,7 @@ public class UsageRecordServiceImpl extends ServiceImpl<UsageRecordMapper, Usage
     try {
       // 插入记录后，监听服务器会自动识别
       usageRecordMapper.insert(usageRecord);
-      this.addRecordEndQueue(params);
+      // this.addRecordEndQueue(params);
     } catch (Exception e) {
       // 记录错误日志并抛出异常
       log.error("使用记录创建失败", e);

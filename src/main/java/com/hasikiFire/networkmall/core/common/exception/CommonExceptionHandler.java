@@ -71,11 +71,11 @@ public class CommonExceptionHandler {
     /**
      * 处理无角色异常
      */
-    @ExceptionHandler(NotRoleException.class)
-    public RestResp<Void> handlerNotRoleException(NotRoleException e) {
-        log.error(e.getMessage(), e);
-        return RestResp.fail(ErrorCodeEnum.USER_NO_ROLE); // 使用自定义的错误码
-    }
+    // @ExceptionHandler(NotRoleException.class)
+    // public RestResp<Void> handlerNotRoleException(NotRoleException e) {
+    //     log.error(e.getMessage(), e);
+    //     return RestResp.fail(ErrorCodeEnum.USER_NO_ROLE); // 使用自定义的错误码
+    // }
 
     /**
      * 处理系统异常

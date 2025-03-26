@@ -16,6 +16,7 @@ import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.dao.entity.PayOrder;
 import com.hasikiFire.networkmall.dao.entity.UsageRecord;
 import com.hasikiFire.networkmall.dao.entity.User;
+import com.hasikiFire.networkmall.dto.req.UpdateUserReqDTO;
 import com.hasikiFire.networkmall.dto.req.PackageAddReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageEditReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageListReqDto;
@@ -73,11 +74,9 @@ public class AdminController {
   }
 
   @Operation(summary = "禁用/删除用户")
-  @PostMapping("/user/changeStatus")
-  // `status` tinyint NOT NULL COMMENT '状态 1 正常 0 无效 2 已禁用（触发审计规则）',
-  public RestResp<String> deleteUser(
-      @Parameter(schema = @Schema(description = "`status` tinyint NOT NULL COMMENT '状态 1 正常 0 无效 2 已禁用（触发审计规则）'")) @RequestParam Integer status) {
-    return userService.deleteUser(status);
+  @PostMapping("/user/updateUserStatus")
+  public RestResp<Boolean> updateUserStatus(@Valid @RequestBody UpdateUserReqDTO req) {
+    return userService.updateUserStatus(req);
   }
 
   // 套餐列表

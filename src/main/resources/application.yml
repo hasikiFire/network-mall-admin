@@ -3,7 +3,7 @@ spring:
     # 应用名
     name: network-mall
   profiles:
-    active: prod
+    active: test
 
   data:
     # Redis 配置
@@ -38,6 +38,7 @@ spring:
     password: 123456 # RabbitMQ 密码
     virtual-host: / # 虚拟主机，默认是 "/"
     connection-timeout: 60000 # 连接超时时间（单位：毫秒）
+    publisher-confirm-type: correlated
     listener:
       simple:
         prefetch: 10 # 每个消费者预取的消息数量
@@ -107,6 +108,6 @@ cors:
 
 logging:
   level:
-    root: info   #主日志级别
+    root: info #主日志级别
     # com.hasikiFire.networkmall: debug   #该项目日志级别，当需要打印sql时请开启为debug
   path: ./logs

@@ -6,7 +6,6 @@ import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.core.payment.PayQrcode;
 import com.hasikiFire.networkmall.core.payment.PayResponse;
-import com.hasikiFire.networkmall.core.payment.PaymentStrategy;
 import com.hasikiFire.networkmall.dao.entity.PackageItem;
 import com.hasikiFire.networkmall.dao.entity.PayOrder;
 import com.hasikiFire.networkmall.dao.entity.UsageRecord;
@@ -18,22 +17,15 @@ import com.hasikiFire.networkmall.dto.req.PackageAddReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageBuyReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageEditReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageListReqDto;
-import com.hasikiFire.networkmall.dto.req.UsageRecordAddReqDto;
 import com.hasikiFire.networkmall.dto.resp.PackageListRespDto;
 import com.hasikiFire.networkmall.dto.resp.PackageRespDto;
 import com.hasikiFire.networkmall.service.PackageService;
 import com.hasikiFire.networkmall.service.PayOrderItemService;
 import com.hasikiFire.networkmall.service.PayOrderService;
-import com.hasikiFire.networkmall.service.UsageRecordService;
-
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.bean.copier.CopyOptions;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import com.alibaba.fastjson.JSON;
-import com.alipay.api.domain.Person;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -46,8 +38,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.bouncycastle.crypto.util.Pack;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,7 +60,7 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
   private final PayOrderService payOrderService;
   private final PayOrderItemService payOrderItemService;
   private final UsageRecordMapper usageRecordMapper;
-
+  // private final RabbitTemplate rabbitTemplate;
   // private final RateLimiter rateLimiter;
 
   @Override
@@ -178,7 +169,7 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
     if (reqDto.getPackageDesc() != null) {
       updateWrapper.set(PackageItem::getPackageDesc, reqDto.getPackageDesc());
     }
-    // 其他字段同理...
+
     if (reqDto.getDiscountStartDate() != null) {
       updateWrapper.set(PackageItem::getDiscountStartDate, reqDto.getDiscountStartDate());
     }

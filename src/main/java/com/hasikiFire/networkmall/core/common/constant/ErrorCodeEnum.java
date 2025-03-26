@@ -27,7 +27,7 @@ public enum ErrorCodeEnum {
     /**
      * 用户登录已过期
      */
-    USER_LOGIN_EXPIRED(401, "用户登录已过期"),
+    // USER_LOGIN_EXPIRED(401, "用户登录已过期"),
 
     /**
      * 用户未登录
@@ -37,12 +37,12 @@ public enum ErrorCodeEnum {
     /**
      * 用户无权限
      */
-    USER_NO_PERMISSION(403, "用户无权限"),
+    // USER_NO_PERMISSION(403, "用户无权限"),
 
     /**
      * 用户无角色
      */
-    USER_NO_ROLE(403, "用户无角色"),
+    USER_NO_PERMISSION(403, "用户无权限/无角色"),
 
     /**
      * 参数校验失败

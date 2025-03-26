@@ -3,6 +3,7 @@ package com.hasikiFire.networkmall.service;
 import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.dao.entity.User;
+import com.hasikiFire.networkmall.dto.req.UpdateUserReqDTO;
 import com.hasikiFire.networkmall.dto.req.UserCreateDto;
 import com.hasikiFire.networkmall.dto.req.UserEditDto;
 import com.hasikiFire.networkmall.dto.req.UserListReqDto;
@@ -56,7 +57,7 @@ public interface UserService extends IService<User> {
 
   RestResp<User> updateUser(UserEditDto user);
 
-  RestResp<String> deleteUser(Integer status);
+  RestResp<Boolean> updateUserStatus(UpdateUserReqDTO reqDTO);
 
   RestResp<User> createUser(UserCreateDto user);
 

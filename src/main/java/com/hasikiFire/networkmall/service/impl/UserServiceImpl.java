@@ -10,6 +10,7 @@ package com.hasikiFire.networkmall.service.impl;
 
 import com.hasikiFire.networkmall.core.common.constant.DatabaseConsts;
 import com.hasikiFire.networkmall.core.common.constant.DatabaseConsts.RolesTable.RoleEnum;
+import com.hasikiFire.networkmall.core.common.constant.RabbitMQConstants;
 import com.hasikiFire.networkmall.core.common.constant.SendCodeTypeEnum;
 import com.hasikiFire.networkmall.core.common.exception.BusinessException;
 import com.hasikiFire.networkmall.core.common.req.UserDto;
@@ -33,7 +34,10 @@ import com.hasikiFire.networkmall.dao.mapper.RolesMapper;
 import com.hasikiFire.networkmall.dao.mapper.UsageRecordMapper;
 import com.hasikiFire.networkmall.dao.mapper.UserMapper;
 import com.hasikiFire.networkmall.dao.mapper.WalletMapper;
+import com.hasikiFire.networkmall.dto.req.UpdateUserReqDTO;
 import com.hasikiFire.networkmall.dto.req.ForeignServerListReqDto;
+import com.hasikiFire.networkmall.dto.req.SendMsgCodeToMqDto;
+import com.hasikiFire.networkmall.dto.req.SendMsgCodeToMqParams;
 import com.hasikiFire.networkmall.dto.req.UserCreateDto;
 import com.hasikiFire.networkmall.dto.req.UserEditDto;
 import com.hasikiFire.networkmall.dto.req.UserListReqDto;
@@ -59,6 +63,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.nio.charset.StandardCharsets;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -69,6 +76,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageDeliveryMode;
+import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
@@ -100,6 +113,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   private final ConfigMapper configMapper;
   private final LinkMapper linkMapper;
   private final UserMapper userMapper;
+  private final RabbitTemplate rabbitTemplate;
+
   @Autowired
   private RedisUtil redisUtil;
 
@@ -114,7 +129,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     // 校验验证码是否正确
     if (emailCode == null || !emailCode.equals(dto.getVelCode())) {
       // 验证码校验失败
-      throw new BusinessException("验证码错误");
+      return RestResp.fail("验证码错误");
     }
 
     User user = createNewUser((UserDto) dto);
@@ -143,13 +158,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         .last(DatabaseConsts.SqlEnum.LIMIT_1.getSql());
     User user = userMapper.selectOne(queryWrapper);
     if (user == null) {
-      throw new BusinessException("邮箱或者密码错误");
+      return RestResp.fail("邮箱或者密码错误");
     }
     String passwordHash = DigestUtils.md5DigestAsHex(
         (dto.getPassword() + user.getSalt()).getBytes(StandardCharsets.UTF_8));
 
     if (!passwordHash.equals(user.getPasswordHash())) {
-      throw new BusinessException("邮箱或者密码错误");
+      return RestResp.fail("邮箱或者密码错误");
     }
 
     StpUtil.login(user.getId());
@@ -168,7 +183,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, id));
     Roles roles = roleMapper.selectOne(new LambdaQueryWrapper<Roles>().eq(Roles::getUserId, id));
     if (user == null) {
-      throw new BusinessException("用户不存在");
+      return RestResp.fail("用户不存在");
     }
     return RestResp.ok(
         UserInfoRespDto.builder()
@@ -288,14 +303,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
       user = userMapper.selectOne(queryWrapper);
       log.info("User: selectOne {}", user);
       if (user == null) {
-        throw new BusinessException("用户不存在");
+        return RestResp.fail("用户不存在");
       } else {
         user = updateNewUser(dto, user);
       }
     }
 
     if (user == null) {
-      throw new BusinessException("更新失败");
+      return RestResp.fail("更新失败");
     }
 
     return RestResp.ok(user);
@@ -381,9 +396,57 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   }
 
   @Override
-  public RestResp<String> deleteUser(Integer status) {
-    return null;
-    // 在这里实现 deleteUser 方法
+  public RestResp<Boolean> updateUserStatus(UpdateUserReqDTO req) {
+    LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+    queryWrapper.eq(User::getId, req.getUserID());
+    User user = userMapper.selectOne(queryWrapper);
+    if (user == null) {
+      return RestResp.fail("用户不存在");
+    }
+
+    if (req.getStatus() != null) {
+      if (req.getStatus() == 1) {
+        // 删除用户
+        user.setStatus(1);
+        userMapper.updateById(user);
+      }
+      if (req.getStatus() == 2) {
+        // 删除用户
+        user.setStatus(2);
+        userMapper.updateById(user);
+        SendMQMsg("deleteUser", user.getId());
+      }
+    }
+    if (req.getIsDelete() != null && req.getIsDelete() == 1) {
+      // 删除用户
+      user.setDeleted(1);
+      user.setStatus(0);
+      SendMQMsg("deleteUser", user.getId());
+      userMapper.updateById(user);
+    }
+
+    return RestResp.ok(true);
+  }
+
+  private void SendMQMsg(String method, Long userID) {
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      String json = mapper.writeValueAsString(new SendMsgCodeToMqDto(method, new SendMsgCodeToMqParams(userID)));
+
+      CorrelationData correlationData = new CorrelationData("msg-" + System.currentTimeMillis());
+      // 手动构造 Message，避免 RabbitTemplate 二次序列化
+      MessageProperties props = new MessageProperties();
+      props.setCorrelationId(correlationData.getId());
+      String key = (String) redisUtil.get(RabbitMQConstants.GOST_QUEUE_KEY);
+      props.setHeader("x-api-key", key);
+      Message message = new Message(json.getBytes(StandardCharsets.UTF_8), props); // 直接发送字节数组
+      log.info("[SendMsgCodeToMq] 准备发送mq消息 {}", json);
+      rabbitTemplate.send(RabbitMQConstants.GOST_EXCHANGE, "", message);
+
+    } catch (JsonProcessingException e) {
+      log.error("[SendMsgCodeToMq] 发送mq消息失败", e.getMessage());
+    }
+
   }
 
   @Override
@@ -391,7 +454,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     User user = createNewUser((UserDto) dto);
 
     if (user == null) {
-      throw new BusinessException("创建失败");
+      return RestResp.fail("创建失败");
     }
     return RestResp.ok(user);
   }
@@ -456,6 +519,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         ClashHttpProxy clashHttpProxy = ClashHttpProxy.builder()
             .name(record.getServerName())
             .server(record.getDomainName())
+            // 不同套餐不同端口的？没必要，更改进程文件描述符限制即可
             .port(record.getPort())
             .username(Long.toString(user.getId()))
             .password(user.getPasswordHash())
