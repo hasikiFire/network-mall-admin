@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
+import com.hasikiFire.networkmall.dto.req.ResetPasswordDTO;
 import com.hasikiFire.networkmall.dto.req.UserLoginReqDto;
 import com.hasikiFire.networkmall.dto.req.UserRegisterReqDto;
 import com.hasikiFire.networkmall.dto.req.UsersendEmailCodeDto;
@@ -137,10 +138,10 @@ public class UserController {
         result.getConsumedDataTransfer(),
         result.getExpire());
   }
-  // @Operation(summary = "重置密码接口") TODO
-  // @PostMapping("resetPassword")
-  // public RestResp<UserLoginRespDto> resetPassword(String email) {
-  // return userService.resetPassword(email);
-  // // https://juejin.cn/post/6844903777246560263
-  // }
+
+  @Operation(summary = "重置密码接口")
+  @PostMapping("resetPassword")
+  public RestResp<String> resetPassword(ResetPasswordDTO reqDTO) {
+    return userService.resetPassword(reqDTO);
+  }
 }

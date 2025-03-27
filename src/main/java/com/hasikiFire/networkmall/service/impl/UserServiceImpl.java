@@ -36,6 +36,7 @@ import com.hasikiFire.networkmall.dao.mapper.UserMapper;
 import com.hasikiFire.networkmall.dao.mapper.WalletMapper;
 import com.hasikiFire.networkmall.dto.req.UpdateUserReqDTO;
 import com.hasikiFire.networkmall.dto.req.ForeignServerListReqDto;
+import com.hasikiFire.networkmall.dto.req.ResetPasswordDTO;
 import com.hasikiFire.networkmall.dto.req.SendMsgCodeToMqDto;
 import com.hasikiFire.networkmall.dto.req.SendMsgCodeToMqParams;
 import com.hasikiFire.networkmall.dto.req.UserCreateDto;
@@ -558,6 +559,45 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     } catch (Exception e) {
       log.error("[generateSubscribe] error: {}", e.getMessage());
       throw new BusinessException("生成订阅内容失败");
+    }
+
+  }
+
+  @Override
+  public RestResp<String> resetPassword(ResetPasswordDTO dto) {
+    try {
+      if (dto.getEmail() == null) {
+        RestResp.fail("邮箱不能为空");
+      }
+
+      if (dto.getPassword() == null) {
+        RestResp.fail("密码不能为空");
+      }
+
+      String redisKey = SendCodeTypeEnum.UPDATE_PASSWORD.getType() + ":" + dto.getEmail();
+      String emailCode = (String) redisUtil.get(redisKey);
+
+      // 校验验证码是否正确
+      if (emailCode == null || !emailCode.equals(dto.getVelCode())) {
+        // 验证码校验失败
+        return RestResp.fail("验证码错误");
+      }
+
+      User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getEmail, dto.getEmail()));
+      if (user == null) {
+        return RestResp.fail("用户不存在");
+      }
+
+      String salt = PasswordUtils.generateSalt();
+      String passwordHash = DigestUtils.md5DigestAsHex(
+          (dto.getPassword() + salt).getBytes(StandardCharsets.UTF_8));
+      user.setPasswordHash(
+          passwordHash);
+      user.setSalt(salt);
+      userMapper.updateById(user);
+      return RestResp.ok("");
+    } catch (Exception e) {
+      return RestResp.fail("[resetPassword] 重置密码失败: ", e.getMessage());
     }
 
   }

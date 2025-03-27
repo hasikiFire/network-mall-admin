@@ -3,6 +3,7 @@ package com.hasikiFire.networkmall.service;
 import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.dao.entity.User;
+import com.hasikiFire.networkmall.dto.req.ResetPasswordDTO;
 import com.hasikiFire.networkmall.dto.req.UpdateUserReqDTO;
 import com.hasikiFire.networkmall.dto.req.UserCreateDto;
 import com.hasikiFire.networkmall.dto.req.UserEditDto;
@@ -64,4 +65,6 @@ public interface UserService extends IService<User> {
   RestResp<String> getSubscribe();
 
   SubscribeRespDto generateSubscribe(String token);
+
+  RestResp<String> resetPassword(ResetPasswordDTO req);
 }
