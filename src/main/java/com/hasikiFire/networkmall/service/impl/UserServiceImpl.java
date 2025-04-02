@@ -122,6 +122,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   @Autowired
   private JavaMailSender javaMailSender;
 
+  // TODO 密码加密传输
   @Override
   public RestResp<UserRegisterRespDto> register(UserRegisterReqDto dto) {
     String redisKey = SendCodeTypeEnum.REGISTER.getType() + ":" + dto.getEmail();
@@ -134,8 +135,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     User user = createNewUser((UserDto) dto);
-    // 删除验证码
-    redisUtil.delete(redisKey);
+
     Roles role = new Roles();
     role.setUserId(user.getId());
     role.setRoleName(RoleEnum.USER.getRoleName());
@@ -143,6 +143,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     StpUtil.login(user.getId());
     String token = StpUtil.getTokenValue();
+    // 删除验证码
+    redisUtil.delete(redisKey);
     // 生成JWT 并返回
     return RestResp.ok(
         UserRegisterRespDto.builder()
@@ -202,13 +204,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     try {
       String redisKey = emailDto.getType().getType() + ":" + emailDto.getEmail();
       String code = RandomStringUtils.randomNumeric(4);
-      redisUtil.set(redisKey, code, 10, TimeUnit.MINUTES);
       SimpleMailMessage message = new SimpleMailMessage();
       message.setFrom(username);
       message.setTo(emailDto.getEmail());
       message.setSubject("验证码");
       message.setText("本次" + emailDto.getType().getDesc() + "为: " + code + "，有效期为 10 分钟");
       javaMailSender.send(message);
+      redisUtil.set(redisKey, code, 10, TimeUnit.MINUTES);
       return RestResp.ok();
     } catch (MailException e) {
       throw new BusinessException(e.getMessage());
@@ -595,6 +597,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
           passwordHash);
       user.setSalt(salt);
       userMapper.updateById(user);
+      SendMQMsg("updateUserPassword", user.getId());
+      redisUtil.delete(redisKey);
       return RestResp.ok("");
     } catch (Exception e) {
       return RestResp.fail("[resetPassword] 重置密码失败: ", e.getMessage());

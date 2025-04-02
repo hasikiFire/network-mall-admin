@@ -141,7 +141,7 @@ public class UserController {
 
   @Operation(summary = "重置密码接口")
   @PostMapping("resetPassword")
-  public RestResp<String> resetPassword(ResetPasswordDTO reqDTO) {
+  public RestResp<String> resetPassword(@Valid @RequestBody ResetPasswordDTO reqDTO) {
     return userService.resetPassword(reqDTO);
   }
 }
