@@ -57,7 +57,7 @@ public class AdminController {
 
   @Operation(summary = "查询用户列表")
   @GetMapping("/user/getList")
-  public RestResp<PageRespDto<UserListRespDto>> getUserList(@Valid @RequestParam UserListReqDto params) {
+  public RestResp<PageRespDto<UserListRespDto>> getUserList(@Valid UserListReqDto params) {
     return userService.getUserList(params);
   }
 

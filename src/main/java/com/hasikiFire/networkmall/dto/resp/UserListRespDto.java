@@ -39,5 +39,5 @@ public class UserListRespDto {
     @Schema(description = "货币类型（1：人民币 2: USDT）")
     private String currency;
 
-    private List<UsageRecord> usageRecord;
+    // private List<UsageRecord> usageRecord;
 }

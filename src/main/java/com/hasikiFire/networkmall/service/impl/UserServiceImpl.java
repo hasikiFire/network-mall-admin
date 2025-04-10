@@ -257,14 +257,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     Map<Long, Wallet> userIdToWalletMap = wallets.stream()
         .collect(Collectors.toMap(Wallet::getUserId, wallet -> wallet));
-    Map<Long, List<UsageRecord>> userIdToPackageRecordsMap = usageRecords.stream()
-        .collect(Collectors.groupingBy(UsageRecord::getUserId));
+    // Map<Long, List<UsageRecord>> userIdToPackageRecordsMap = usageRecords.stream()
+    //     .collect(Collectors.groupingBy(UsageRecord::getUserId));
 
     List<UserListRespDto> userListRespDtos = users.stream().map(user -> {
       Long userId = user.getId();
       Wallet userWallet = userIdToWalletMap.get(userId);
-      List<UsageRecord> userPackageRecords = userIdToPackageRecordsMap.getOrDefault(userId,
-          new ArrayList<>());
+      // List<UsageRecord> userPackageRecords = userIdToPackageRecordsMap.getOrDefault(userId,
+      //     new ArrayList<>());
 
       return UserListRespDto.builder()
           .userId(user.getId())
@@ -276,7 +276,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
           .balance(userWallet != null ? userWallet.getBalance() : null)
           .currency(userWallet != null ? userWallet.getCurrency() : null)
-          .usageRecord(userPackageRecords)
+          // .usageRecord(userPackageRecords)
           .build();
     }).collect(Collectors.toList());
 
