@@ -244,16 +244,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     // 2. 获取所有的userId
     List<Long> userIds = users.stream().map(User::getId).collect(Collectors.toList());
-    log.info("User IDs: {}", userIds);
+    // log.info("User IDs: {}", userIds);
     // 3. 根据userId查询wallet表, 取出balance和currency字段
     List<Wallet> wallets = walletMapper.selectList(new QueryWrapper<Wallet>().in("user_id", userIds)
         .select("user_id", "balance", "currency"));
-    log.info("User wallets: {}", wallets);
+    // log.info("User wallets: {}", wallets);
     // 4. 根据userId查询UsageRecord表，筛选出purchaseStatus为1的记录
-    List<UsageRecord> usageRecords = usageRecordMapper.selectList(new QueryWrapper<UsageRecord>().in("user_id", userIds)
-        .eq("purchase_status", 1));
+    // List<UsageRecord> usageRecords = usageRecordMapper.selectList(new QueryWrapper<UsageRecord>().in("user_id", userIds)
+    //     .eq("purchase_status", 1));
 
-    log.info("User usageRecords: {}", usageRecords);
+    // log.info("User usageRecords: {}", usageRecords);
 
     Map<Long, Wallet> userIdToWalletMap = wallets.stream()
         .collect(Collectors.toMap(Wallet::getUserId, wallet -> wallet));

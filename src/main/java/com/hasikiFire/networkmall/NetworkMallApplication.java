@@ -28,14 +28,12 @@ public class NetworkMallApplication {
 		SpringApplication.run(NetworkMallApplication.class, args);
 	}
 
-	/**
-	 * 添加分页插件
-	 */
 	@Bean
 	public MybatisPlusInterceptor mybatisPlusInterceptor() {
 		MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
-		interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL)); // 如果配置多个插件, 切记分页最后添加
-		// 如果有多数据源可以不配具体类型, 否则都建议配上具体的 DbType
+		PaginationInnerInterceptor pagination = new PaginationInnerInterceptor(DbType.MYSQL);
+		pagination.setMaxLimit(1000L); // 可选：设置单页最大记录数
+		interceptor.addInnerInterceptor(pagination);
 		return interceptor;
 	}
 }
