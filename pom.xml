@@ -19,12 +19,10 @@
 		<java.version>17</java.version>
 		<mybatis-plus.version>3.5.5</mybatis-plus.version>
 		<mybatis-plus-generator.version>3.5.1</mybatis-plus-generator.version>
-		<jjwt.version>0.11.5</jjwt.version>
 		<redisson.version>3.19.1</redisson.version>
 		<spring-boot-admin.version>3.0.0</spring-boot-admin.version>
 		<springdoc-openapi.version>2.5.0</springdoc-openapi.version>
 		<sa-token-spring-boot3-starter.version>1.38.0</sa-token-spring-boot3-starter.version>
-		<jjwt.version>0.11.5</jjwt.version>
 		<hutool.version>5.8.11</hutool.version>
 		<lombok.version>1.18.36</lombok.version>
 		<fastjson.version>1.2.83</fastjson.version>
@@ -131,12 +129,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-		</dependency>
-
-		<!-- 请求参数校验相关 -->
-		<dependency>
-			<groupId>org.hibernate.validator</groupId>
-			<artifactId>hibernate-validator</artifactId>
 		</dependency>
 
 
