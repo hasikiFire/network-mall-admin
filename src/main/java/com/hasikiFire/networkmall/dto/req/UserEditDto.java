@@ -22,9 +22,6 @@ public class UserEditDto implements UserDto {
   @Schema(description = "密码")
   private String password;
 
-  @Schema(description = "邀请代码")
-  private String inviteCode;
-
   @Schema(description = "状态, 1 正常 0 无效 2 已禁用（触发审计规则）")
   private Integer status;
 }

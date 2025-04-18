@@ -169,6 +169,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     if (!passwordHash.equals(user.getPasswordHash())) {
       return RestResp.fail("邮箱或者密码错误");
     }
+    if (user.getStatus() != 1 || user.getDeleted() == 1) {
+      return RestResp.fail("用户已被禁用");
+    }
 
     StpUtil.login(user.getId());
     String token = StpUtil.getTokenValue();
@@ -250,21 +253,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         .select("user_id", "balance", "currency"));
     // log.info("User wallets: {}", wallets);
     // 4. 根据userId查询UsageRecord表，筛选出purchaseStatus为1的记录
-    // List<UsageRecord> usageRecords = usageRecordMapper.selectList(new QueryWrapper<UsageRecord>().in("user_id", userIds)
-    //     .eq("purchase_status", 1));
+    // List<UsageRecord> usageRecords = usageRecordMapper.selectList(new
+    // QueryWrapper<UsageRecord>().in("user_id", userIds)
+    // .eq("purchase_status", 1));
 
     // log.info("User usageRecords: {}", usageRecords);
 
     Map<Long, Wallet> userIdToWalletMap = wallets.stream()
         .collect(Collectors.toMap(Wallet::getUserId, wallet -> wallet));
-    // Map<Long, List<UsageRecord>> userIdToPackageRecordsMap = usageRecords.stream()
-    //     .collect(Collectors.groupingBy(UsageRecord::getUserId));
+    // Map<Long, List<UsageRecord>> userIdToPackageRecordsMap =
+    // usageRecords.stream()
+    // .collect(Collectors.groupingBy(UsageRecord::getUserId));
 
     List<UserListRespDto> userListRespDtos = users.stream().map(user -> {
       Long userId = user.getId();
       Wallet userWallet = userIdToWalletMap.get(userId);
-      // List<UsageRecord> userPackageRecords = userIdToPackageRecordsMap.getOrDefault(userId,
-      //     new ArrayList<>());
+      // List<UsageRecord> userPackageRecords =
+      // userIdToPackageRecordsMap.getOrDefault(userId,
+      // new ArrayList<>());
 
       return UserListRespDto.builder()
           .userId(user.getId())
@@ -297,24 +303,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
   @Override
   public RestResp<User> updateUser(UserEditDto dto) {
-    User user = null;
-    if (dto.getUserId() == null) {
-      user = createNewUser((UserDto) dto);
-    } else {
-      LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
-      queryWrapper.eq(User::getId, dto.getUserId());
-      user = userMapper.selectOne(queryWrapper);
-      log.info("User: selectOne {}", user);
-      if (user == null) {
-        return RestResp.fail("用户不存在");
-      } else {
-        user = updateNewUser(dto, user);
-      }
+    User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, dto.getUserId()));
+    if (user == null) {
+      return RestResp.fail("用户不存在");
     }
 
-    if (user == null) {
-      return RestResp.fail("更新失败");
+    if (dto.getName() != null) {
+      user.setName(dto.getName());
     }
+    if (dto.getEmail() != null) {
+      user.setEmail(dto.getEmail());
+    }
+    if (dto.getStatus() != null) {
+      user.setStatus(dto.getStatus());
+    }
+    if (dto.getPassword() != null) {
+      String salt = PasswordUtils.generateSalt();
+      String passwordHash = DigestUtils.md5DigestAsHex(
+          (dto.getPassword() + salt).getBytes(StandardCharsets.UTF_8));
+      user.setPasswordHash(
+          passwordHash);
+      user.setSalt(salt);
+    }
+
+    userMapper.updateById(user);
 
     return RestResp.ok(user);
 
@@ -335,9 +347,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     if (newUserDtoser.getName() != null) {
       oldUser.setName(newUserDtoser.getName());
     }
-    if (newUserDtoser.getInviteCode() != null) {
-      oldUser.setInviteCode(newUserDtoser.getInviteCode());
-    }
+    // if (newUserDtoser.getInviteCode() != null) {
+    // oldUser.setInviteCode(newUserDtoser.getInviteCode());
+    // }
     if (newUserDtoser.getEmail() != null) {
       if (!newUserDtoser.getEmail().equals(oldUser.getEmail())) {
         throw new BusinessException("新邮箱与旧邮箱一致，无需修改");
