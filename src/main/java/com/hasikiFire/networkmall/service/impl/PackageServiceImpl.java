@@ -141,11 +141,6 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
       }
     }
 
-    // 检查套餐名称是否已存在
-    if (packageMapper.existsByPackageName(reqDto.getPackageName())) {
-      return RestResp.fail("套餐名称已存在");
-    }
-
     PackageItem packageItem = packageMapper
         .selectOne(
             new LambdaQueryWrapper<PackageItem>().eq(PackageItem::getId, reqDto.getId()).eq(PackageItem::getDeleted,
